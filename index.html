@@ -1,0 +1,1746 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prospecto Pro | Gestão de Prospecção e Análise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Nova Paleta de Cores Empresarial */
+        :root {
+            --primary: #2196F3; /* Azul mais corporativo */
+            --primary-dark: #1976D2;
+            --secondary: #4CAF50; /* Verde para sucesso/positivo */
+            --secondary-dark: #388E3C;
+            --accent: #FFC107; /* Amarelo/âmbar para avisos/destaque */
+            --danger: #F44336; /* Vermelho para perigo/exclusão */
+            --warning: #FF9800; /* Laranja para atenção */
+            --info: #03A9F4; /* Azul claro para informações */
+            --text-dark: #333333; /* Texto principal mais escuro */
+            --text-light: #666666; /* Texto secundário */
+            --background-light: #F8F9FA; /* Fundo mais claro */
+            --background-card: #FFFFFF; /* Fundo dos cards */
+            --border-color: #E0E0E0; /* Cor da borda padrão */
+            --shadow-color: rgba(0, 0, 0, 0.08); /* Sombra mais sutil */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Garante que o footer fique no final da página */
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 20px 0;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 28px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas menores */
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none; /* Para links */
+            color: inherit; /* Garante que a cor do texto do link seja herdada */
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary);
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #D32F2F;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        .btn-warning:hover {
+            background-color: #F57C00;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background-color: var(--info);
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #0288D1;
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            background-color: var(--background-card);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color); /* Borda sutil */
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            color: var(--text-dark);
+            background-color: var(--background-light);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid var(--warning);
+            color: var(--warning);
+        }
+        
+        .alert-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .alert-info {
+            background-color: rgba(3, 169, 244, 0.1);
+            border-left: 4px solid var(--info);
+            color: var(--info);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-light);
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        .close-btn:hover {
+            opacity: 1;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 14px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        th {
+            background-color: var(--background-light);
+            font-weight: 600;
+            color: var(--text-dark);
+            position: sticky;
+            top: 0;
+            z-index: 1; /* Para que o cabeçalho fique sobre o conteúdo ao rolar */
+        }
+        
+        tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        
+        .badge-primary {
+            background-color: rgba(33, 150, 243, 0.15);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(76, 175, 80, 0.15);
+            color: var(--secondary);
+        }
+        
+        .badge-danger {
+            background-color: rgba(244, 67, 54, 0.15);
+            color: var(--danger);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 152, 0, 0.15);
+            color: var(--warning);
+        }
+        
+        .badge-info {
+            background-color: rgba(3, 169, 244, 0.15);
+            color: var(--info);
+        }
+        
+        .badge-purple { /* Mantido para 'restrição' */
+            background-color: rgba(156, 39, 176, 0.15); 
+            color: #9C27B0;
+        }
+        
+        .badge-teal { /* Mantido para 'recuperado' */
+            background-color: rgba(0, 150, 136, 0.15);
+            color: #009688;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 5px;
+            font-size: 14px;
+            background-color: transparent;
+            color: var(--text-light);
+        }
+        
+        .action-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .action-btn i {
+            font-size: 15px;
+        }
+        
+        .today-contact {
+            background-color: rgba(255, 152, 0, 0.05);
+            border-left: 3px solid var(--warning);
+        }
+        
+        .money {
+            font-family: 'Roboto Mono', 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .status-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .status-filter-btn {
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            background-color: var(--background-card);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .status-filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 5px rgba(33, 150, 243, 0.2);
+        }
+        
+        .status-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para a seção de gráficos */
+        .analytics-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px; /* Altura padrão para o gráfico */
+            width: 100%;
+        }
+
+        /* Estilos para a seção de relatórios */
+        .reports-section .report-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Estilos para o rodapé */
+        footer {
+            margin-top: auto; /* Empurra o rodapé para baixo */
+            background-color: var(--primary-dark);
+            color: white;
+            text-align: center;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 -4px 12px var(--shadow-color);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        /* Estilos para impressão */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .printable-content, .printable-content * {
+                visibility: visible;
+            }
+            .printable-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                color: #000;
+            }
+            .printable-content h1, .printable-content h2 {
+                text-align: center;
+                margin-bottom: 20px;
+                color: #333;
+            }
+            .printable-content table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            .printable-content th, .printable-content td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+                font-size: 12px;
+            }
+            .printable-content th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+            .printable-content .badge {
+                /* Manter o estilo do badge se for relevante na impressão */
+                -webkit-print-color-adjust: exact; /* Força cores de fundo na impressão */
+                color-adjust: exact;
+                background-color: #eee; /* Cor de fundo padrão para badges na impressão */
+                padding: 3px 6px;
+                border-radius: 10px;
+                font-size: 10px;
+                display: inline-block;
+            }
+            /* Cores específicas para badges na impressão */
+            .printable-content .badge-warning { background-color: #ffda6e !important; }
+            .printable-content .badge-success { background-color: #a8e6cf !important; }
+            .printable-content .badge-danger { background-color: #ff9999 !important; }
+            .printable-content .badge-primary { background-color: #92d1ff !important; }
+            .printable-content .badge-purple { background-color: #e0b0ff !important; }
+            .printable-content .badge-info { background-color: #89e4ff !important; }
+            .printable-content .badge-teal { background-color: #8eebe0 !important; }
+
+            .printable-content .money {
+                font-family: 'Courier New', monospace;
+            }
+
+            footer {
+                display: none; /* Não exibe o rodapé na impressão */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .analytics-section {
+                grid-template-columns: 1fr; /* Uma coluna em telas menores */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-building"></i> 
+                <h1>Prospecto Pro</h1>
+            </div>
+            <div class="actions">
+                <a href="https://dinheiroeplanejamento.blogspot.com/" target="_blank" class="btn btn-outline" title="Visitar Blog">
+                    <i class="fas fa-blog"></i> Blog
+                </a>
+                <button id="exportBtn" class="btn btn-outline">
+                    <i class="fas fa-file-export"></i> Exportar Dados
+                </button>
+                <button id="importBtn" class="btn btn-outline">
+                    <i class="fas fa-file-import"></i> Importar Dados
+                </button>
+                <input type="file" id="fileInput" class="file-input" accept=".json">
+                <button id="newClientBtn" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Novo Cliente
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="contactAlert" class="alert alert-warning hidden">
+            <span id="alertMessage"></span>
+            <button class="close-btn">&times;</button>
+        </div>
+        
+        <div id="successAlert" class="alert alert-success hidden">
+            <span id="successMessage"></span>
+            <button class="close-btn">&times;</button>
+        </div>
+
+        <div id="infoAlert" class="alert alert-info hidden">
+            <span id="infoMessage"></span>
+            <button class="close-btn">&times;</button>
+        </div>
+        
+        <div class="card hidden" id="clientFormCard">
+            <div class="card-header">
+                <h2 class="card-title" id="formTitle">Novo Cliente</h2>
+                <button id="cancelForm" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+            <form id="clientForm">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="nome" class="form-label">Nome do Cliente*</label>
+                            <input type="text" id="nome" class="form-control" required placeholder="Nome completo do cliente">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            <input type="text" id="telefone" class="form-control" placeholder="(00) 00000-0000" maxlength="15">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="email" class="form-label">E-mail</label>
+                            <input type="email" id="email" class="form-control" placeholder="cliente@exemplo.com">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" class="form-control">
+                                <option value="pendente">Pendente</option>
+                                <option value="comprou">Comprou</option>
+                                <option value="desistiu">Desistiu</option>
+                                <option value="procurando">Procurando mais barato</option>
+                                <option value="restricao">Restrição</option>
+                                <option value="condicionado">Condicionado</option>
+                                <option value="recuperado">Recuperado</option>
+                                <option value="aprovado">Aprovado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="pretensao" class="form-label">Valor do Imóvel (R$)</label>
+                            <input type="text" id="pretensao" class="form-control money-input" placeholder="0,00">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="tipoImovel" class="form-label">Tipo de Imóvel</label>
+                            <input type="text" id="tipoImovel" class="form-control" placeholder="Ex: Apartamento 2 quartos, Casa, Terreno">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="observacoes" class="form-label">Observações</label>
+                    <textarea id="observacoes" rows="4" class="form-control" placeholder="Detalhes adicionais sobre o cliente ou o imóvel..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="dataContato" class="form-label">Data do Último Contato</label>
+                            <input type="date" id="dataContato" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="proximoContato" class="form-label">Próximo Contato Agendado</label>
+                            <input type="date" id="proximoContato" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" id="saveClient" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salvar Cliente
+                    </button>
+                </div>
+                <input type="hidden" id="editId" value="">
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Análise de Prospecção</h2>
+            </div>
+            <div class="analytics-section">
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="recuperadosAprovadosChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card reports-section">
+            <div class="card-header">
+                <h2 class="card-title">Relatórios</h2>
+            </div>
+            <div class="report-options">
+                <button id="reportAllClientsBtn" class="btn btn-info">
+                    <i class="fas fa-print"></i> Imprimir Todos os Clientes
+                </button>
+                <select id="reportStatusSelect" class="form-control" style="width: auto;">
+                    <option value="">Selecionar Status para Relatório</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="comprou">Comprou</option>
+                    <option value="desistiu">Desistiu</option>
+                    <option value="procurando">Procurando mais barato</option>
+                    <option value="restricao">Restrição</option>
+                    <option value="condicionado">Condicionado</option>
+                    <option value="recuperado">Recuperado</option>
+                    <option value="aprovado">Aprovado</option>
+                </select>
+                <button id="reportStatusBtn" class="btn btn-info" disabled>
+                    <i class="fas fa-print"></i> Imprimir por Status
+                </button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Clientes</h2>
+                <div class="actions">
+                    <input type="text" id="search" class="form-control" placeholder="Pesquisar clientes..." style="width: 250px;">
+                </div>
+            </div>
+            
+            <div class="status-filter">
+                <button class="status-filter-btn active" data-status="all">Todos</button>
+                <button class="status-filter-btn" data-status="pendente">Pendente</button>
+                <button class="status-filter-btn" data-status="comprou">Comprou</button>
+                <button class="status-filter-btn" data-status="procurando">Procurando</button>
+                <button class="status-filter-btn" data-status="aprovado">Aprovado</button>
+                <button class="status-filter-btn" data-status="restricao">Restrição</button>
+                <button class="status-filter-btn" data-status="condicionado">Condicionado</button>
+                <button class="status-filter-btn" data-status="recuperado">Recuperado</button>
+                <button class="status-filter-btn" data-status="desistiu">Desistiu</button>
+            </div>
+            
+            <div class="table-responsive">
+                <table id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Contato</th>
+                            <th>Status</th>
+                            <th>Valor Imóvel</th>
+                            <th>Tipo Imóvel</th>
+                            <th>Últ. Contato</th>
+                            <th>Próx. Contato</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsList">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Desenvolvedor - Alex Peixoto - 8299662-2036</p>
+        <p>PIX da Manutenção - CNPJ 31.632.000/0001-38, contribua com o que puder.</p>
+    </footer>
+
+    <script>
+        // Variáveis globais para armazenar os clientes e o filtro atual
+        let clients = JSON.parse(localStorage.getItem('prospectClients')) || [];
+        let currentFilter = 'all'; // Inicia mostrando todos os clientes por padrão
+
+        // Referências aos elementos do DOM para evitar buscas repetidas
+        const clientFormCard = document.getElementById('clientFormCard');
+        const newClientBtn = document.getElementById('newClientBtn');
+        const cancelFormBtn = document.getElementById('cancelForm');
+        const clientForm = document.getElementById('clientForm');
+        const searchInput = document.getElementById('search');
+        const clientsList = document.getElementById('clientsList');
+        const contactAlert = document.getElementById('contactAlert');
+        const alertMessage = document.getElementById('alertMessage');
+        const successAlert = document.getElementById('successAlert');
+        const successMessage = document.getElementById('successMessage');
+        const infoAlert = document.getElementById('infoAlert');
+        const infoMessage = document.getElementById('infoMessage');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const fileInput = document.getElementById('fileInput');
+        const statusFilterBtns = document.querySelectorAll('.status-filter-btn');
+
+        // Elementos para relatórios
+        const reportAllClientsBtn = document.getElementById('reportAllClientsBtn');
+        const reportStatusSelect = document.getElementById('reportStatusSelect');
+        const reportStatusBtn = document.getElementById('reportStatusBtn');
+
+
+        // Instâncias de gráfico para gerenciar a atualização
+        let statusChartInstance = null;
+        let recuperadosAprovadosChartInstance = null;
+
+        /**
+         * Adiciona todos os Event Listeners necessários para a interatividade do sistema.
+         */
+        function addEventListeners() {
+            newClientBtn.addEventListener('click', showForm);
+            cancelFormBtn.addEventListener('click', hideForm);
+            clientForm.addEventListener('submit', saveClient);
+            searchInput.addEventListener('input', filterClients);
+            document.getElementById('telefone').addEventListener('input', formatPhone);
+            document.getElementById('pretensao').addEventListener('input', formatCurrency);
+            
+            // Listener para fechar todos os alertas dinamicamente
+            document.querySelectorAll('.alert .close-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.target.closest('.alert').classList.add('hidden');
+                });
+            });
+
+            exportBtn.addEventListener('click', exportData);
+            importBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', importData);
+            
+            // Listeners para os botões de filtro de status
+            statusFilterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove a classe 'active' de todos os botões e adiciona ao clicado
+                    statusFilterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.status; // Atualiza o filtro atual
+                    filterClients(); // Re-renderiza clientes com o novo filtro
+                });
+            });
+
+            // Listeners para os botões de relatório
+            reportAllClientsBtn.addEventListener('click', () => generateAndPrintReport('all'));
+            reportStatusSelect.addEventListener('change', (e) => {
+                // Habilita o botão de impressão por status se um status for selecionado
+                reportStatusBtn.disabled = e.target.value === '';
+            });
+            reportStatusBtn.addEventListener('click', () => {
+                const selectedStatus = reportStatusSelect.value;
+                if (selectedStatus) {
+                    generateAndPrintReport(selectedStatus);
+                } else {
+                    showAlert('Por favor, selecione um status para gerar o relatório.', 'warning');
+                }
+            });
+        }
+
+        /**
+         * Carrega clientes e renderiza elementos ao iniciar a página.
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            addEventListeners(); // Adiciona os listeners
+            renderClients(); // Exibe a lista inicial de clientes
+            checkScheduledContacts(); // Verifica se há contatos para hoje
+            renderCharts(); // Inicializa e renderiza os gráficos
+        });
+
+        /**
+         * Exibe o formulário de cliente.
+         */
+        function showForm() {
+            clientFormCard.classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Novo Cliente';
+            clearForm(); // Limpa o formulário e define a data de contato para hoje
+            document.getElementById('nome').focus(); // Foca no campo nome para facilitar a digitação
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola para o topo da página
+        }
+
+        /**
+         * Esconde o formulário de cliente e reseta o modo de edição.
+         */
+        function hideForm() {
+            clientFormCard.classList.add('hidden');
+            document.getElementById('editId').value = ''; // Limpa o ID de edição (sai do modo de edição)
+            clearForm(); // Limpa todos os campos do formulário
+        }
+
+        /**
+         * Limpa todos os campos do formulário e define a data de último contato para hoje.
+         */
+        function clearForm() {
+            document.getElementById('nome').value = '';
+            document.getElementById('telefone').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('status').value = 'pendente';
+            document.getElementById('pretensao').value = '';
+            document.getElementById('tipoImovel').value = '';
+            document.getElementById('observacoes').value = '';
+            // Define a data de último contato para a data atual
+            const today = new Date();
+            document.getElementById('dataContato').value = today.toISOString().split('T')[0]; 
+            document.getElementById('proximoContato').value = ''; // Limpa próximo contato
+        }
+
+        /**
+         * Formata o campo de telefone (adiciona parênteses e hífen).
+         * @param {Event} event - O evento de input.
+         */
+        function formatPhone(event) {
+            let value = event.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+            if (value.length > 0) {
+                if (value.length > 10) { // Formato (00) 00000-0000
+                    value = '(' + value.substring(0, 2) + ') ' + value.substring(2, 7) + '-' + value.substring(7, 11);
+                } else if (value.length > 6) { // Formato (00) 0000-0000
+                    value = '(' + value.substring(0, 2) + ') ' + value.substring(2, 6) + '-' + value.substring(6, 10);
+                } else if (value.length > 2) { // Formato (00) 0000
+                    value = '(' + value.substring(0, 2) + ') ' + value.substring(2, 6);
+                } else if (value.length > 0) { // Formato (00)
+                    value = '(' + value.substring(0, 2) + ')';
+                }
+            }
+            event.target.value = value.substring(0, 15); // Limita o tamanho para o formato completo
+        }
+
+        /**
+         * Formata o campo de valor monetário (adiciona R$, pontos e vírgula).
+         * @param {Event} event - O evento de input.
+         */
+        function formatCurrency(event) {
+            let value = event.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+            if (value === '') {
+                event.target.value = '';
+                return;
+            }
+            value = (parseInt(value, 10) / 100).toFixed(2); // Converte para float com 2 casas decimais
+            value = value.replace(".", ","); // Troca ponto por vírgula para formato brasileiro
+            value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.'); // Adiciona pontos para milhares
+            event.target.value = 'R$ ' + value;
+        }
+
+        /**
+         * Converte uma string monetária para um número float.
+         * @param {string} value - A string monetária (ex: "R$ 1.234,56").
+         * @returns {number} O valor numérico.
+         */
+        function parseCurrency(value) {
+            if (!value) return 0;
+            // Remove "R$", pontos de milhar e troca vírgula por ponto para converter para float
+            return parseFloat(value.replace('R$ ', '').replace(/\./g, '').replace(',', '.'));
+        }
+
+        /**
+         * Formata um número para o padrão monetário brasileiro.
+         * @param {number} value - O valor numérico.
+         * @returns {string} O valor formatado (ex: "R$ 1.234,56").
+         */
+        function formatMoney(value) {
+            if (value === null || value === undefined || isNaN(value)) return '-';
+            return 'R$ ' + parseFloat(value).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+        }
+
+        /**
+         * Salva um novo cliente ou atualiza um existente.
+         * @param {Event} e - O evento de submit do formulário.
+         */
+        function saveClient(e) {
+            e.preventDefault(); // Impede o recarregamento da página
+            
+            // Coleta os valores dos campos do formulário
+            const nome = document.getElementById('nome').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const status = document.getElementById('status').value;
+            const pretensaoFormatada = document.getElementById('pretensao').value.trim();
+            const tipoImovel = document.getElementById('tipoImovel').value.trim();
+            const observacoes = document.getElementById('observacoes').value.trim();
+            const dataContato = document.getElementById('dataContato').value;
+            const proximoContato = document.getElementById('proximoContato').value;
+            const editId = document.getElementById('editId').value;
+
+            // Validação simples: nome é obrigatório
+            if (!nome) {
+                showAlert('Por favor, insira o nome do cliente.', 'warning'); 
+                return;
+            }
+
+            const client = {
+                // Se editId existe, usa ele; senão, cria um novo ID com timestamp
+                id: editId || Date.now().toString(), 
+                nome,
+                telefone,
+                email,
+                status,
+                pretensao: pretensaoFormatada, // Salva a pretensão como string formatada
+                tipoImovel,
+                observacoes,
+                dataContato,
+                proximoContato,
+                valorNumerico: parseCurrency(pretensaoFormatada), // Salva o valor numérico para gráficos/cálculos
+                // Mantém a data de cadastro original ou cria uma nova se for um novo cliente
+                dataCadastro: editId ? clients.find(c => c.id === editId)?.dataCadastro || new Date().toISOString() : new Date().toISOString()
+            };
+
+            if (editId) {
+                // Modo de edição: encontra e atualiza o cliente existente
+                const index = clients.findIndex(c => c.id === editId);
+                if (index !== -1) {
+                    clients[index] = client;
+                    showAlert('Cliente atualizado com sucesso! ✅', 'success');
+                }
+            } else {
+                // Modo de adição: adiciona o novo cliente à lista
+                clients.push(client);
+                showAlert('Cliente cadastrado com sucesso! 🎉', 'success');
+            }
+
+            // Salva os dados atualizados no Local Storage
+            localStorage.setItem('prospectClients', JSON.stringify(clients));
+            renderClients(); // Atualiza a tabela
+            hideForm(); // Esconde o formulário
+            checkScheduledContacts(); // Re-verifica contatos agendados
+            renderCharts(); // Atualiza os gráficos
+        }
+
+        /**
+         * Renderiza a lista de clientes na tabela, aplicando filtros e ordenação.
+         * @param {Array<Object>} [filteredClients=null] - Opcional: uma lista de clientes já filtrada.
+         */
+        function renderClients(filteredClients = null) {
+            let clientsToRender = filteredClients || clients;
+            
+            // Aplica filtro de status se não estiver já filtrado pela pesquisa OU se a pesquisa estiver vazia
+            // Isso evita que o filtro de status sobrescreva os resultados da pesquisa
+            if (!filteredClients && currentFilter !== 'all') {
+                clientsToRender = clientsToRender.filter(client => client.status === currentFilter);
+            } else if (filteredClients && searchInput.value === '' && currentFilter !== 'all') {
+                 // Caso filteredClients exista (vindo da pesquisa), mas o input de pesquisa está vazio
+                 // e o filtro de status está ativo, reaplica o filtro de status.
+                 clientsToRender = clientsToRender.filter(client => client.status === currentFilter);
+            }
+            // Se a pesquisa estiver ativa, a função filterClients já passa os clientes filtrados,
+            // então não é necessário filtrar por status novamente aqui.
+
+            clientsList.innerHTML = ''; // Limpa a tabela antes de renderizar
+
+            if (clientsToRender.length === 0) {
+                clientsList.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 30px; color: var(--text-light);">
+                            <i class="fas fa-inbox" style="font-size: 40px; color: var(--border-color); margin-bottom: 10px;"></i>
+                            <p>Nenhum cliente encontrado com os filtros aplicados.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Ordena por data de próximo contato (mais próximos primeiro)
+            // Clientes sem data de próximo contato são movidos para o final
+            clientsToRender.sort((a, b) => {
+                if (!a.proximoContato && !b.proximoContato) return 0;
+                if (!a.proximoContato) return 1; 
+                if (!b.proximoContato) return -1;
+                return new Date(a.proximoContato) - new Date(b.proximoContato);
+            });
+
+            // Cria e insere as linhas da tabela para cada cliente
+            clientsToRender.forEach(client => {
+                const row = document.createElement('tr');
+                
+                // Verifica se o próximo contato é hoje para aplicar estilo de destaque
+                const hoje = new Date().toISOString().split('T')[0];
+                const isTodayContact = client.proximoContato === hoje;
+                if (isTodayContact) {
+                    row.classList.add('today-contact');
+                }
+
+                const badgeClass = getBadgeClass(client.status); // Obtém a classe CSS para o badge do status
+
+                row.innerHTML = `
+                    <td>${client.nome}</td>
+                    <td>
+                        ${client.telefone ? client.telefone + '<br>' : ''}
+                        ${client.email || ''}
+                    </td>
+                    <td><span class="badge ${badgeClass}">${formatStatus(client.status)}</span></td>
+                    <td class="money">${client.pretensao || '-'}</td>
+                    <td>${client.tipoImovel || '-'}</td>
+                    <td>${client.dataContato ? formatDate(client.dataContato) : '-'}</td>
+                    <td>${client.proximoContato ? formatDate(client.proximoContato) : '-'}</td>
+                    <td>
+                        <button class="action-btn" title="Editar" data-id="${client.id}" data-action="edit" style="color: var(--primary);">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" title="Excluir" data-id="${client.id}" data-action="delete" style="color: var(--danger);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="action-btn" title="Visualizar" data-id="${client.id}" data-action="view" style="color: var(--info);">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+
+                clientsList.appendChild(row);
+            });
+
+            // Adiciona event listeners aos botões de ação (editar, excluir, visualizar)
+            clientsList.querySelectorAll('.action-btn').forEach(btn => {
+                const action = btn.dataset.action;
+                const id = btn.dataset.id;
+                
+                // Usa um switch para lidar com diferentes ações
+                switch(action) {
+                    case 'edit':
+                        btn.addEventListener('click', () => editClient(id));
+                        break;
+                    case 'delete':
+                        btn.addEventListener('click', () => deleteClient(id));
+                        break;
+                    case 'view':
+                        btn.addEventListener('click', () => viewClient(id));
+                        break;
+                }
+            });
+        }
+
+        /**
+         * Retorna a classe CSS apropriada para o badge de status.
+         * @param {string} status - O status do cliente.
+         * @returns {string} A classe CSS do badge.
+         */
+        function getBadgeClass(status) {
+            switch(status) {
+                case 'pendente': return 'badge-warning';
+                case 'comprou': return 'badge-success';
+                case 'desistiu': return 'badge-danger';
+                case 'procurando': return 'badge-primary';
+                case 'restricao': return 'badge-purple';
+                case 'condicionado': return 'badge-info';
+                case 'recuperado': return 'badge-teal';
+                case 'aprovado': return 'badge-success';
+                default: return 'badge-primary';
+            }
+        }
+
+        /**
+         * Formata o valor do status para exibição (ex: "pendente" -> "Pendente").
+         * @param {string} status - O status original.
+         * @returns {string} O status formatado.
+         */
+        function formatStatus(status) {
+            const statusMap = {
+                'pendente': 'Pendente',
+                'comprou': 'Comprou',
+                'desistiu': 'Desistiu',
+                'procurando': 'Procurando',
+                'restricao': 'Restrição',
+                'condicionado': 'Condicionado',
+                'recuperado': 'Recuperado',
+                'aprovado': 'Aprovado'
+            };
+            return statusMap[status] || status; 
+        }
+
+        /**
+         * Formata uma string de data (YYYY-MM-DD) para o formato brasileiro (DD/MM/YYYY).
+         * @param {string} dateString - A string da data.
+         * @returns {string} A data formatada ou '-' se for nula/vazia.
+         */
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            // Adiciona T00:00:00 para garantir que a data seja interpretada corretamente no fuso horário local
+            const date = new Date(dateString + 'T00:00:00'); 
+            // Usa toLocaleDateString com pt-BR para garantir o formato DD/MM/YYYY
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        /**
+         * Preenche o formulário com os dados de um cliente para edição.
+         * @param {string} id - O ID do cliente a ser editado.
+         */
+        function editClient(id) {
+            const client = clients.find(c => c.id === id);
+            if (!client) {
+                showAlert('Cliente não encontrado para edição.', 'warning');
+                return;
+            }
+
+            // Preenche cada campo do formulário com os dados do cliente
+            document.getElementById('nome').value = client.nome;
+            document.getElementById('telefone').value = client.telefone;
+            document.getElementById('email').value = client.email;
+            document.getElementById('status').value = client.status;
+            document.getElementById('pretensao').value = client.pretensao;
+            document.getElementById('tipoImovel').value = client.tipoImovel;
+            document.getElementById('observacoes').value = client.observacoes;
+            document.getElementById('dataContato').value = client.dataContato;
+            document.getElementById('proximoContato').value = client.proximoContato;
+            document.getElementById('editId').value = client.id; // Define o ID para indicar que é uma edição
+            document.getElementById('formTitle').textContent = 'Editar Cliente'; // Muda o título do formulário
+
+            clientFormCard.classList.remove('hidden'); // Mostra o formulário
+            document.getElementById('nome').focus(); // Foca no campo nome
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola para o topo
+        }
+
+        /**
+         * Exclui um cliente da lista.
+         * @param {string} id - O ID do cliente a ser excluído.
+         */
+        function deleteClient(id) {
+            if (confirm('Tem certeza que deseja excluir este cliente? Esta ação é irreversível.')) {
+                clients = clients.filter(c => c.id !== id); // Cria uma nova lista sem o cliente excluído
+                localStorage.setItem('prospectClients', JSON.stringify(clients)); // Salva no Local Storage
+                renderClients(); // Re-renderiza a tabela
+                checkScheduledContacts(); // Re-verifica os contatos agendados
+                renderCharts(); // Atualiza os gráficos
+                showAlert('Cliente excluído com sucesso! 🗑️', 'success');
+            }
+        }
+
+        /**
+         * Exibe os detalhes de um cliente em um modal.
+         * @param {string} id - O ID do cliente a ser visualizado.
+         */
+        function viewClient(id) {
+            const client = clients.find(c => c.id === id);
+            if (!client) {
+                showAlert('Cliente não encontrado para visualização.', 'warning');
+                return;
+            }
+
+            const observacoes = client.observacoes || 'Nenhuma observação cadastrada.';
+            
+            // Estrutura HTML do modal de visualização
+            const modalHTML = `
+                <div id="viewClientModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px);">
+                    <div style="background: var(--background-card); padding: 25px; border-radius: 10px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 25px var(--shadow-color); border: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                            <h3 style="margin: 0; color: var(--primary);">Detalhes do Cliente</h3>
+                            <button onclick="document.getElementById('viewClientModal').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); opacity: 0.7;">&times;</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">Nome:</p>
+                                <p>${client.nome}</p>
+                            </div>
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">Status:</p>
+                                <p><span class="badge ${getBadgeClass(client.status)}">${formatStatus(client.status)}</span></p>
+                            </div>
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">Telefone:</p>
+                                <p>${client.telefone || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">E-mail:</p>
+                                <p>${client.email || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">Valor do Imóvel:</p>
+                                <p class="money">${client.pretensao || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">Tipo de Imóvel:</p>
+                                <p>${client.tipoImovel || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">Último Contato:</p>
+                                <p>${client.dataContato ? formatDate(client.dataContato) : '-'}</p>
+                            </div>
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">Próximo Contato:</p>
+                                <p>${client.proximoContato ? formatDate(client.proximoContato) : '-'}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; margin-bottom: 5px; color: var(--text-dark);">Observações:</p>
+                            <p style="white-space: pre-line; background-color: var(--background-light); padding: 10px; border-radius: 5px; border: 1px solid var(--border-color);">${observacoes}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const div = document.createElement('div');
+            div.innerHTML = modalHTML;
+            document.body.appendChild(div);
+        }
+
+        /**
+         * Filtra a lista de clientes com base no termo de pesquisa e no filtro de status.
+         */
+        function filterClients() {
+            const searchTerm = searchInput.value.toLowerCase();
+            let filtered = clients;
+
+            // Aplica o filtro de status primeiro, se não for 'all'
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(client => client.status === currentFilter);
+            }
+
+            // Em seguida, aplica o filtro de pesquisa ao resultado já filtrado por status
+            if (searchTerm) {
+                filtered = filtered.filter(client => 
+                    (client.nome && client.nome.toLowerCase().includes(searchTerm)) ||
+                    (client.telefone && client.telefone.toLowerCase().includes(searchTerm)) ||
+                    (client.email && client.email.toLowerCase().includes(searchTerm)) ||
+                    (formatStatus(client.status).toLowerCase().includes(searchTerm)) ||
+                    (client.pretensao && client.pretensao.toLowerCase().includes(searchTerm)) ||
+                    (client.tipoImovel && client.tipoImovel.toLowerCase().includes(searchTerm)) ||
+                    (client.observacoes && client.observacoes.toLowerCase().includes(searchTerm))
+                );
+            }
+            renderClients(filtered); // Re-renderiza a tabela com os clientes filtrados
+        }
+
+        /**
+         * Verifica se há clientes com "Próximo Contato" agendado para hoje e exibe um alerta.
+         */
+        function checkScheduledContacts() {
+            const hoje = new Date();
+            // Normaliza a data de hoje para comparação, ignorando a hora
+            const hojeISO = hoje.toISOString().split('T')[0]; 
+            
+            const clientesParaContatar = clients.filter(client => {
+                // Converte a string de data para um objeto Date para comparação precisa
+                return client.proximoContato && (new Date(client.proximoContato + 'T00:00:00')).toISOString().split('T')[0] === hojeISO;
+            });
+            
+            if (clientesParaContatar.length > 0) {
+                const nomesClientes = clientesParaContatar.map(client => `<strong>${client.nome}</strong>`).join(', ');
+                showAlert(`Você tem ${clientesParaContatar.length} cliente(s) para contatar hoje: ${nomesClientes}.`, 'info'); 
+            } else {
+                infoAlert.classList.add('hidden'); // Garante que o alerta de info esteja escondido se não houver contatos
+            }
+        }
+
+        /**
+         * Exibe uma mensagem de alerta para o usuário.
+         * @param {string} message - A mensagem a ser exibida.
+         * @param {string} type - O tipo de alerta ('success', 'warning', 'info').
+         */
+        function showAlert(message, type) {
+            // Esconde todos os alertas primeiro para garantir que apenas um esteja visível
+            contactAlert.classList.add('hidden');
+            successAlert.classList.add('hidden');
+            infoAlert.classList.add('hidden'); 
+
+            if (type === 'success') {
+                successMessage.innerHTML = message;
+                successAlert.classList.remove('hidden');
+                // Alerta de sucesso some após 5 segundos
+                setTimeout(() => {
+                    successAlert.classList.add('hidden');
+                }, 5000); 
+            } else if (type === 'warning') { // Para erros de validação ou avisos
+                alertMessage.innerHTML = message;
+                contactAlert.classList.remove('hidden');
+                // Alerta de aviso/erro permanece até ser fechado manualmente
+            } else if (type === 'info') { // Para mensagens informativas (como o lembrete de contato)
+                infoMessage.innerHTML = message;
+                infoAlert.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Exporta os dados dos clientes para um arquivo JSON.
+         */
+        function exportData() {
+            if (clients.length === 0) {
+                showAlert('Não há dados para exportar.', 'warning');
+                return;
+            }
+
+            const dataStr = JSON.stringify(clients, null, 2); // Formata JSON com indentação para legibilidade
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            // Gera nome de arquivo com data atual
+            const exportFileDefaultName = `backup_prospecção_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            document.body.appendChild(linkElement); // Necessário para Firefox
+            linkElement.click(); // Simula o clique para iniciar o download
+            document.body.removeChild(linkElement); // Remove o elemento após o clique
+            
+            showAlert('Dados exportados com sucesso! 💾', 'success');
+        }
+
+        /**
+         * Importa dados de clientes de um arquivo JSON.
+         * @param {Event} event - O evento de mudança do input de arquivo.
+         */
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                showAlert('Nenhum arquivo selecionado para importação.', 'warning');
+                return;
+            }
+
+            // Verifica se o arquivo é do tipo JSON
+            if (file.type !== 'application/json') {
+                showAlert('Por favor, selecione um arquivo JSON válido.', 'warning');
+                event.target.value = ''; // Limpa o input de arquivo para permitir nova seleção
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    // Verifica se os dados importados são um array
+                    if (Array.isArray(importedData)) {
+                        // Pergunta ao usuário se deseja substituir ou mesclar os dados
+                        if (confirm('Deseja substituir os dados atuais pelos dados importados? Clique em Cancelar para mesclar.')) {
+                            clients = importedData; // Sobrescreve os dados existentes
+                            showAlert('Dados substituídos com sucesso! ✨', 'success');
+                        } else {
+                            // Mescla, adicionando novos clientes ou atualizando existentes por ID
+                            let newClientsAdded = 0;
+                            let clientsUpdated = 0;
+                            importedData.forEach(importedClient => {
+                                const existingIndex = clients.findIndex(c => c.id === importedClient.id);
+                                if (existingIndex !== -1) {
+                                    // Atualiza campos existentes, mantendo outros intactos se não fornecidos
+                                    clients[existingIndex] = { ...clients[existingIndex], ...importedClient }; 
+                                    clientsUpdated++;
+                                } else {
+                                    clients.push(importedClient); // Adiciona novo cliente
+                                    newClientsAdded++;
+                                }
+                            });
+                            showAlert(`Dados mesclados com sucesso! ${newClientsAdded} novos clientes adicionados, ${clientsUpdated} clientes atualizados. ✨`, 'success');
+                        }
+
+                        localStorage.setItem('prospectClients', JSON.stringify(clients));
+                        renderClients(); // Atualiza a tabela
+                        checkScheduledContacts(); // Re-verifica os contatos
+                        renderCharts(); // Atualiza os gráficos
+                    } else {
+                        showAlert('O arquivo JSON não contém uma lista de clientes válida.', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Erro ao ler ou parsear o arquivo JSON:', error);
+                    showAlert('Erro ao importar arquivo. Verifique o formato do JSON. 🚨', 'warning');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Limpa o input de arquivo para permitir re-importação do mesmo arquivo
+        }
+
+        // --- Funções de Gráficos (Chart.js) ---
+
+        /**
+         * Renderiza todos os gráficos no dashboard.
+         */
+        function renderCharts() {
+            updateStatusChart();
+            updateRecuperadosAprovadosChart();
+        }
+
+        /**
+         * Atualiza o gráfico de distribuição de clientes por status.
+         */
+        function updateStatusChart() {
+            // Conta a ocorrência de cada status
+            const statusCounts = clients.reduce((acc, client) => {
+                acc[client.status] = (acc[client.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            const labels = Object.keys(statusCounts).map(status => formatStatus(status));
+            const data = Object.values(statusCounts);
+            
+            // Define cores dinâmicas para o gráfico de pizza
+            const backgroundColors = labels.map(label => {
+                switch(label) {
+                    case 'Pendente': return 'rgba(255, 152, 0, 0.7)'; // Warning
+                    case 'Comprou': return 'rgba(76, 175, 80, 0.7)'; // Secondary
+                    case 'Desistiu': return 'rgba(244, 67, 54, 0.7)'; // Danger
+                    case 'Procurando': return 'rgba(33, 150, 243, 0.7)'; // Primary
+                    case 'Restrição': return 'rgba(156, 39, 176, 0.7)'; // Purple
+                    case 'Condicionado': return 'rgba(3, 169, 244, 0.7)'; // Info
+                    case 'Recuperado': return 'rgba(0, 150, 136, 0.7)'; // Teal
+                    case 'Aprovado': return 'rgba(76, 175, 80, 0.9)'; // Secondary (mais intenso)
+                    default: return 'rgba(100, 100, 100, 0.7)';
+                }
+            });
+
+            const borderColors = labels.map(label => {
+                switch(label) {
+                    case 'Pendente': return 'rgb(255, 152, 0)';
+                    case 'Comprou': return 'rgb(76, 175, 80)';
+                    case 'Desistiu': return 'rgb(244, 67, 54)';
+                    case 'Procurando': return 'rgb(33, 150, 243)';
+                    case 'Restrição': return 'rgb(156, 39, 176)';
+                    case 'Condicionado': return 'rgb(3, 169, 244)';
+                    case 'Recuperado': return 'rgb(0, 150, 136)';
+                    case 'Aprovado': return 'rgb(76, 175, 80)';
+                    default: return 'rgb(100, 100, 100)';
+                }
+            });
+
+            const ctx = document.getElementById('statusChart').getContext('2d');
+
+            // Destrói a instância anterior do gráfico se ela existir para evitar sobreposição
+            if (statusChartInstance) {
+                statusChartInstance.destroy();
+            }
+
+            statusChartInstance = new Chart(ctx, {
+                type: 'pie', // Tipo de gráfico: pizza
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Clientes por Status',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Permite que a altura seja controlada pelo CSS
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-light'), // Usa variável CSS para a cor
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribuição de Clientes por Status',
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-dark'),
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((sum, current) => sum + current, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) + '%' : '0%';
+                                    return `${label}: ${value} (${percentage})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Atualiza o gráfico de taxas de clientes recuperados e aprovados.
+         */
+        function updateRecuperadosAprovadosChart() {
+            const totalClients = clients.length;
+            const recuperadosCount = clients.filter(client => client.status === 'recuperado').length;
+            const aprovadosCount = clients.filter(client => client.status === 'aprovado').length;
+
+            const recuperadosPercentage = totalClients > 0 ? parseFloat(((recuperadosCount / totalClients) * 100).toFixed(1)) : 0;
+            const aprovadosPercentage = totalClients > 0 ? parseFloat(((aprovadosCount / totalClients) * 100).toFixed(1)) : 0;
+
+            const ctx = document.getElementById('recuperadosAprovadosChart').getContext('2d');
+
+            // Destrói a instância anterior do gráfico se ela existir
+            if (recuperadosAprovadosChartInstance) {
+                recuperadosAprovadosChartInstance.destroy();
+            }
+
+            recuperadosAprovadosChartInstance = new Chart(ctx, {
+                type: 'bar', // Tipo de gráfico: barras
+                data: {
+                    labels: ['Recuperados', 'Aprovados'],
+                    datasets: [{
+                        label: 'Taxa de Clientes (%)',
+                        data: [recuperadosPercentage, aprovadosPercentage],
+                        backgroundColor: [
+                            'rgba(0, 150, 136, 0.7)', // Teal para Recuperados
+                            'rgba(76, 175, 80, 0.7)'  // Secondary para Aprovados
+                        ],
+                        borderColor: [
+                            'rgb(0, 150, 136)',
+                            'rgb(76, 175, 80)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false // Não precisa de legenda para 2 barras simples
+                        },
+                        title: {
+                            display: true,
+                            text: 'Taxas de Clientes Recuperados e Aprovados',
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-dark'),
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100, // Escala de 0 a 100 para porcentagem
+                            title: {
+                                display: true,
+                                text: 'Porcentagem (%)',
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-light')
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-light')
+                            },
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--border-color')
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-light')
+                            },
+                            grid: {
+                                display: false // Esconde a grade vertical
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Funções de Relatórios e Impressão ---
+
+        /**
+         * Gera o conteúdo HTML do relatório e o envia para impressão.
+         * @param {string} type - Tipo de relatório ('all' para todos os clientes, ou um status específico).
+         */
+        function generateAndPrintReport(type) {
+            let reportClients = [];
+            let reportTitle = 'Relatório de Clientes';
+
+            if (type === 'all') {
+                reportClients = [...clients]; // Copia todos os clientes
+                reportTitle = `Relatório Completo de Clientes (${reportClients.length} Clientes)`;
+            } else {
+                reportClients = clients.filter(client => client.status === type);
+                reportTitle = `Relatório de Clientes com Status: ${formatStatus(type)} (${reportClients.length} Clientes)`;
+            }
+
+            if (reportClients.length === 0) {
+                showAlert(`Não há clientes para gerar o relatório com o status "${formatStatus(type)}".`, 'warning');
+                return;
+            }
+
+            // Ordena os clientes do relatório por nome
+            reportClients.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            let tableRowsHtml = '';
+            reportClients.forEach(client => {
+                const badgeClass = getBadgeClass(client.status);
+                tableRowsHtml += `
+                    <tr>
+                        <td>${client.nome}</td>
+                        <td>
+                            ${client.telefone ? client.telefone + '<br>' : ''}
+                            ${client.email || ''}
+                        </td>
+                        <td><span class="badge ${badgeClass}">${formatStatus(client.status)}</span></td>
+                        <td class="money">${client.pretensao || '-'}</td>
+                        <td>${client.tipoImovel || '-'}</td>
+                        <td>${client.dataContato ? formatDate(client.dataContato) : '-'}</td>
+                        <td>${client.proximoContato ? formatDate(client.proximoContato) : '-'}</td>
+                        <td>${client.observacoes || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            const reportHtml = `
+                <div class="printable-content">
+                    <h1>Prospecto Pro</h1>
+                    <h2>${reportTitle}</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Contato</th>
+                                <th>Status</th>
+                                <th>Valor Imóvel</th>
+                                <th>Tipo Imóvel</th>
+                                <th>Últ. Contato</th>
+                                <th>Próx. Contato</th>
+                                <th>Observações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRowsHtml}
+                        </tbody>
+                    </table>
+                    <p style="text-align: center; margin-top: 30px; font-size: 12px; color: #555;">
+                        Relatório gerado em: ${formatDate(new Date().toISOString().split('T')[0])} às ${new Date().toLocaleTimeString('pt-BR')}
+                    </p>
+                </div>
+            `;
+
+            // Abre uma nova janela para impressão
+            const printWindow = window.open('', '_blank');
+            if (printWindow) {
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="pt-BR">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>${reportTitle}</title>
+                        <style>
+                            /* Inclui os estilos de impressão diretamente no documento a ser impresso */
+                            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; color: #000; }
+                            h1, h2 { text-align: center; margin-bottom: 20px; color: #333; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+                            th { background-color: #f2f2f2; font-weight: bold; }
+                            .badge { 
+                                -webkit-print-color-adjust: exact; 
+                                color-adjust: exact;
+                                padding: 3px 6px; border-radius: 10px; font-size: 10px; display: inline-block;
+                                background-color: #eee; /* Fallback */
+                            }
+                            .badge-warning { background-color: #ffda6e !important; color: #6a4500 !important; }
+                            .badge-success { background-color: #a8e6cf !important; color: #2a6a30 !important; }
+                            .badge-danger { background-color: #ff9999 !important; color: #9a2323 !important; }
+                            .badge-primary { background-color: #92d1ff !important; color: #0f4c81 !important; }
+                            .badge-purple { background-color: #e0b0ff !important; color: #5d2871 !important; }
+                            .badge-info { background-color: #89e4ff !important; color: #0c6a8f !important; }
+                            .badge-teal { background-color: #8eebe0 !important; color: #006057 !important; }
+                            .money { font-family: 'Courier New', monospace; }
+                        </style>
+                    </head>
+                    <body>
+                        ${reportHtml}
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+            } else {
+                showAlert('Não foi possível abrir a janela de impressão. Verifique se pop-ups estão bloqueados.', 'warning');
+            }
+        }
+    </script>
+</body>
+</html>
