@@ -522,6 +522,20 @@
         const FUNNEL_PROBABILITIES = {
             'lead': 5, 'contato': 10, 'visita': 25, 'proposta': 50, 'negociacao': 75
         };
+        
+        /**
+         * Converte um valor numérico para uma string de moeda BRL formatada.
+         * Ex: 500000 -> "R$ 500.000,00"
+         * @param {number | null | undefined} value - O valor numérico.
+         * @returns {string} A string formatada ou uma string vazia para valores inválidos.
+         */
+        function formatToBRL(value) {
+            const num = parseFloat(value);
+            if (isNaN(num) || value === null) {
+                return '';
+            }
+            return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
 
         let clients = JSON.parse(localStorage.getItem('prospectClients')) || [];
         let currentFilter = 'all';
@@ -662,19 +676,19 @@
                 e.target.value = value;
             };
 
-            const formatCurrency = (e) => {
+            const formatCurrencyInput = (e) => {
                 let value = e.target.value.replace(/\D/g, '');
                 if (value === '') {
                     e.target.value = '';
                     return;
                 }
-                value = (parseInt(value, 10) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                e.target.value = value;
+                const numValue = parseInt(value, 10) / 100;
+                e.target.value = formatToBRL(numValue);
             };
             
             document.getElementById('telefone').addEventListener('input', formatPhone);
             document.getElementById('corretorTelefone').addEventListener('input', formatPhone);
-            document.getElementById('pretensao').addEventListener('input', formatCurrency);
+            document.getElementById('pretensao').addEventListener('input', formatCurrencyInput);
         }
 
         function showMainPage() {
@@ -748,12 +762,10 @@
         }
 
         function updateFinancialPanel() {
-             const parseCurrency = (value) => parseFloat(value?.replace(/[^\d,]/g, '').replace(',', '.') || 0);
-
             const realizedRevenue = clients
                 .filter(c => c.etapaFunil === 'venda')
                 .reduce((sum, client) => {
-                    const propertyValue = parseCurrency(client.pretensao);
+                    const propertyValue = client.pretensao || 0;
                     const commissionRate = (parseFloat(client.comissao) || corretorData.defaultComissao || 5) / 100;
                     return sum + (propertyValue * commissionRate);
                 }, 0);
@@ -761,7 +773,7 @@
             const revenueForecast = clients
                 .filter(c => c.etapaFunil !== 'venda' && c.etapaFunil !== 'perdido')
                 .reduce((sum, client) => {
-                    const propertyValue = parseCurrency(client.pretensao);
+                    const propertyValue = client.pretensao || 0;
                     const commissionRate = (parseFloat(client.comissao) || corretorData.defaultComissao || 5) / 100;
                     const probability = FUNNEL_PROBABILITIES[client.etapaFunil] || 0;
                     return sum + (propertyValue * commissionRate * probability / 100);
@@ -770,12 +782,11 @@
             const potentialRevenue = clients
                 .filter(c => c.etapaFunil !== 'venda' && c.etapaFunil !== 'perdido')
                 .reduce((sum, client) => {
-                    const propertyValue = parseCurrency(client.pretensao);
+                    const propertyValue = client.pretensao || 0;
                     const commissionRate = (parseFloat(client.comissao) || corretorData.defaultComissao || 5) / 100;
                     return sum + (propertyValue * commissionRate);
                 }, 0);
             
-            const formatToBRL = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('realizedRevenue').textContent = formatToBRL(realizedRevenue);
             document.getElementById('revenueForecast').textContent = formatToBRL(revenueForecast);
             document.getElementById('potentialRevenue').textContent = formatToBRL(potentialRevenue);
@@ -787,15 +798,14 @@
             if (monthlyChart) monthlyChart.destroy();
             if (propertyTypeChart) propertyTypeChart.destroy();
             
-            const parseCurrency = (value) => parseFloat(value?.replace(/[^\d,]/g, '').replace(',', '.') || 0);
-
             const funnelData = Object.keys(FUNNEL_STAGES).map(key => 
                 clients.filter(c => c.etapaFunil === key).length
             );
             
-            const realized = clients.filter(c => c.etapaFunil === 'venda').reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100)), 0);
-            const forecast = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100) * (FUNNEL_PROBABILITIES[c.etapaFunil]/100)), 0);
-            const potential = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100)), 0) - forecast;
+            const defaultCommission = corretorData.defaultComissao || 5;
+            const realized = clients.filter(c => c.etapaFunil === 'venda').reduce((sum, c) => sum + ((c.pretensao || 0) * ((parseFloat(c.comissao) || defaultCommission)/100)), 0);
+            const forecast = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + ((c.pretensao || 0) * ((parseFloat(c.comissao) || defaultCommission)/100) * (FUNNEL_PROBABILITIES[c.etapaFunil]/100)), 0);
+            const potential = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + ((c.pretensao || 0) * ((parseFloat(c.comissao) || defaultCommission)/100)), 0) - forecast;
             
             const propertyTypes = {};
             clients.forEach(client => {
@@ -888,7 +898,7 @@
             }
             
             filteredClients.forEach(client => {
-                const propertyValue = client.pretensao || 'Não informado';
+                const propertyValue = client.pretensao ? formatToBRL(client.pretensao) : 'Não informado';
                 const propertyType = client.tipoImovel || 'Não informado';
                 const lastContact = client.dataContato ? new Date(client.dataContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Nunca';
                 const nextContact = client.proximoContato ? new Date(client.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não agendado';
@@ -924,7 +934,7 @@
                 document.getElementById('telefone').value = client.telefone || '';
                 document.getElementById('email').value = client.email || '';
                 document.getElementById('etapaFunil').value = client.etapaFunil || 'lead';
-                document.getElementById('pretensao').value = client.pretensao || '';
+                document.getElementById('pretensao').value = client.pretensao ? formatToBRL(client.pretensao) : '';
                 document.getElementById('comissao').value = client.comissao || corretorData.defaultComissao || '';
                 document.getElementById('tipoImovel').value = client.tipoImovel || '';
                 document.getElementById('observacoes').value = client.observacoes || '';
@@ -973,9 +983,9 @@
                 id: clientId || Date.now().toString(),
                 nome: nome,
                 telefone: telefone,
-                email: email,
+                email: document.getElementById('email').value,
                 etapaFunil: document.getElementById('etapaFunil').value,
-                pretensao: document.getElementById('pretensao').value,
+                pretensao: (document.getElementById('pretensao').value.replace(/\D/g, '') / 100) || null,
                 comissao: document.getElementById('comissao').value,
                 tipoImovel: document.getElementById('tipoImovel').value,
                 observacoes: document.getElementById('observacoes').value,
@@ -1101,14 +1111,14 @@
                 ["nome", "telefone", "email", "etapaFunil", "pretensao", "comissao", "tipoImovel", "observacoes", "proximoContato"]
             ];
             const exampleData = [
-                ["João da Silva (Exemplo)", "(11) 98765-4321", "joao.silva@exemplo.com", "lead", "R$ 500.000,00", "5", "Apartamento", "Cliente buscando 3 quartos na Zona Sul", "2025-12-31"]
+                ["João da Silva (Exemplo)", "(11) 98765-4321", "joao.silva@exemplo.com", "lead", "500000", "5", "Apartamento", "Cliente buscando 3 quartos na Zona Sul", "2025-12-31"]
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(templateHeaders.concat(exampleData));
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Clientes");
 
-            const note = `Nota: A coluna 'etapaFunil' deve conter um dos seguintes valores (sem acentos): ${Object.keys(FUNNEL_STAGES).join(', ')}.`;
+            const note = `Nota: A coluna 'etapaFunil' deve conter um dos seguintes valores (sem acentos): ${Object.keys(FUNNEL_STAGES).join(', ')}. A coluna 'pretensao' deve ser um número, sem formatação de moeda (ex: 500000.00).`;
             const noteSheet = XLSX.utils.aoa_to_sheet([["Instruções"], [note]]);
             XLSX.utils.book_append_sheet(wb, noteSheet, "Instruções");
 
@@ -1179,7 +1189,7 @@
                                 telefone: String(newClient.telefone) || '',
                                 email: newClient.email || '',
                                 etapaFunil: newClient.etapaFunil && FUNNEL_STAGES[newClient.etapaFunil.toLowerCase()] ? newClient.etapaFunil.toLowerCase() : 'lead',
-                                pretensao: newClient.pretensao || '',
+                                pretensao: parseFloat(newClient.pretensao) || null,
                                 comissao: newClient.comissao || '',
                                 tipoImovel: newClient.tipoImovel || '',
                                 observacoes: newClient.observacoes || '',
@@ -1244,7 +1254,7 @@
                             <td>${c.nome}</td>
                             <td>${c.telefone}${c.email ? `<br>${c.email}` : ''}</td>
                             <td>${FUNNEL_STAGES[c.etapaFunil]}</td>
-                            <td>${c.pretensao || 'N/A'}</td>
+                            <td>${c.pretensao ? formatToBRL(c.pretensao) : 'N/A'}</td>
                             <td>${c.proximoContato ? new Date(c.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A'}</td>
                         </tr>`).join('')}
                     </tbody></table></body></html>`);
