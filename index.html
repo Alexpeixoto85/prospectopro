@@ -499,6 +499,11 @@
                     <div class="form-group"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Configurações</button></div>
                     <hr style="margin: 25px 0;">
                     <div class="form-group">
+                        <label class="form-label" style="font-size: 1.1em;">Gerenciamento de Dados</label>
+                        <p style="font-size: 14px; color: var(--text-light); margin-top: -8px; margin-bottom: 12px;">Execute ações de limpeza e manutenção na sua base de clientes.</p>
+                        <button type="button" id="removeDuplicatesBtn" class="btn btn-warning" style="margin-bottom: 10px; margin-right: 10px;"><i class="fas fa-user-shield"></i> Remover Clientes Duplicados</button>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label" style="color: var(--danger); font-size: 1.1em;">Zona de Perigo</label>
                         <p style="font-size: 14px; color: var(--text-light); margin-top: -8px; margin-bottom: 12px;">Cuidado: Esta ação é irreversível e apagará permanentemente todos os dados.</p>
                         <button type="button" id="clearSystemBtn" class="btn btn-danger"><i class="fas fa-bomb"></i> Limpar Sistema</button>
@@ -522,20 +527,6 @@
         const FUNNEL_PROBABILITIES = {
             'lead': 5, 'contato': 10, 'visita': 25, 'proposta': 50, 'negociacao': 75
         };
-        
-        /**
-         * Converte um valor numérico para uma string de moeda BRL formatada.
-         * Ex: 500000 -> "R$ 500.000,00"
-         * @param {number | null | undefined} value - O valor numérico.
-         * @returns {string} A string formatada ou uma string vazia para valores inválidos.
-         */
-        function formatToBRL(value) {
-            const num = parseFloat(value);
-            if (isNaN(num) || value === null) {
-                return '';
-            }
-            return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
 
         let clients = JSON.parse(localStorage.getItem('prospectClients')) || [];
         let currentFilter = 'all';
@@ -606,6 +597,7 @@
             document.getElementById('corretorForm').addEventListener('submit', saveCorretorData);
             document.getElementById('cancelForm').addEventListener('click', () => closeModal(clientModal));
             document.getElementById('clearSystemBtn').addEventListener('click', clearSystem);
+            document.getElementById('removeDuplicatesBtn').addEventListener('click', removeDuplicates); // NOVO EVENTO
 
             // Botões de navegação e ação (usando classes)
             document.querySelectorAll('.show-main-page').forEach(btn => btn.addEventListener('click', showMainPage));
@@ -676,19 +668,19 @@
                 e.target.value = value;
             };
 
-            const formatCurrencyInput = (e) => {
+            const formatCurrency = (e) => {
                 let value = e.target.value.replace(/\D/g, '');
                 if (value === '') {
                     e.target.value = '';
                     return;
                 }
-                const numValue = parseInt(value, 10) / 100;
-                e.target.value = formatToBRL(numValue);
+                value = (parseInt(value, 10) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                e.target.value = value;
             };
             
             document.getElementById('telefone').addEventListener('input', formatPhone);
             document.getElementById('corretorTelefone').addEventListener('input', formatPhone);
-            document.getElementById('pretensao').addEventListener('input', formatCurrencyInput);
+            document.getElementById('pretensao').addEventListener('input', formatCurrency);
         }
 
         function showMainPage() {
@@ -762,10 +754,12 @@
         }
 
         function updateFinancialPanel() {
+             const parseCurrency = (value) => parseFloat(value?.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+
             const realizedRevenue = clients
                 .filter(c => c.etapaFunil === 'venda')
                 .reduce((sum, client) => {
-                    const propertyValue = client.pretensao || 0;
+                    const propertyValue = parseCurrency(client.pretensao);
                     const commissionRate = (parseFloat(client.comissao) || corretorData.defaultComissao || 5) / 100;
                     return sum + (propertyValue * commissionRate);
                 }, 0);
@@ -773,7 +767,7 @@
             const revenueForecast = clients
                 .filter(c => c.etapaFunil !== 'venda' && c.etapaFunil !== 'perdido')
                 .reduce((sum, client) => {
-                    const propertyValue = client.pretensao || 0;
+                    const propertyValue = parseCurrency(client.pretensao);
                     const commissionRate = (parseFloat(client.comissao) || corretorData.defaultComissao || 5) / 100;
                     const probability = FUNNEL_PROBABILITIES[client.etapaFunil] || 0;
                     return sum + (propertyValue * commissionRate * probability / 100);
@@ -782,11 +776,12 @@
             const potentialRevenue = clients
                 .filter(c => c.etapaFunil !== 'venda' && c.etapaFunil !== 'perdido')
                 .reduce((sum, client) => {
-                    const propertyValue = client.pretensao || 0;
+                    const propertyValue = parseCurrency(client.pretensao);
                     const commissionRate = (parseFloat(client.comissao) || corretorData.defaultComissao || 5) / 100;
                     return sum + (propertyValue * commissionRate);
                 }, 0);
             
+            const formatToBRL = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('realizedRevenue').textContent = formatToBRL(realizedRevenue);
             document.getElementById('revenueForecast').textContent = formatToBRL(revenueForecast);
             document.getElementById('potentialRevenue').textContent = formatToBRL(potentialRevenue);
@@ -798,14 +793,15 @@
             if (monthlyChart) monthlyChart.destroy();
             if (propertyTypeChart) propertyTypeChart.destroy();
             
+            const parseCurrency = (value) => parseFloat(value?.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+
             const funnelData = Object.keys(FUNNEL_STAGES).map(key => 
                 clients.filter(c => c.etapaFunil === key).length
             );
             
-            const defaultCommission = corretorData.defaultComissao || 5;
-            const realized = clients.filter(c => c.etapaFunil === 'venda').reduce((sum, c) => sum + ((c.pretensao || 0) * ((parseFloat(c.comissao) || defaultCommission)/100)), 0);
-            const forecast = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + ((c.pretensao || 0) * ((parseFloat(c.comissao) || defaultCommission)/100) * (FUNNEL_PROBABILITIES[c.etapaFunil]/100)), 0);
-            const potential = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + ((c.pretensao || 0) * ((parseFloat(c.comissao) || defaultCommission)/100)), 0) - forecast;
+            const realized = clients.filter(c => c.etapaFunil === 'venda').reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100)), 0);
+            const forecast = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100) * (FUNNEL_PROBABILITIES[c.etapaFunil]/100)), 0);
+            const potential = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100)), 0) - forecast;
             
             const propertyTypes = {};
             clients.forEach(client => {
@@ -898,7 +894,7 @@
             }
             
             filteredClients.forEach(client => {
-                const propertyValue = client.pretensao ? formatToBRL(client.pretensao) : 'Não informado';
+                const propertyValue = client.pretensao || 'Não informado';
                 const propertyType = client.tipoImovel || 'Não informado';
                 const lastContact = client.dataContato ? new Date(client.dataContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Nunca';
                 const nextContact = client.proximoContato ? new Date(client.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não agendado';
@@ -934,7 +930,7 @@
                 document.getElementById('telefone').value = client.telefone || '';
                 document.getElementById('email').value = client.email || '';
                 document.getElementById('etapaFunil').value = client.etapaFunil || 'lead';
-                document.getElementById('pretensao').value = client.pretensao ? formatToBRL(client.pretensao) : '';
+                document.getElementById('pretensao').value = client.pretensao || '';
                 document.getElementById('comissao').value = client.comissao || corretorData.defaultComissao || '';
                 document.getElementById('tipoImovel').value = client.tipoImovel || '';
                 document.getElementById('observacoes').value = client.observacoes || '';
@@ -985,7 +981,7 @@
                 telefone: telefone,
                 email: document.getElementById('email').value,
                 etapaFunil: document.getElementById('etapaFunil').value,
-                pretensao: (document.getElementById('pretensao').value.replace(/\D/g, '') / 100) || null,
+                pretensao: document.getElementById('pretensao').value,
                 comissao: document.getElementById('comissao').value,
                 tipoImovel: document.getElementById('tipoImovel').value,
                 observacoes: document.getElementById('observacoes').value,
@@ -1098,6 +1094,53 @@
                 save();
             }
         }
+        
+        // NOVA FUNÇÃO
+        function removeDuplicates() {
+            if (!confirm('Tem certeza que deseja remover clientes duplicados? Esta ação verificará por telefone e e-mail, mantendo o primeiro registro encontrado de cada cliente. Esta ação não pode ser desfeita.')) {
+                return;
+            }
+
+            const originalCount = clients.length;
+            const uniqueClients = [];
+            const seenPhones = new Set();
+            const seenEmails = new Set();
+
+            clients.forEach(client => {
+                const normalizedPhone = client.telefone ? client.telefone.replace(/\D/g, '') : '';
+                const normalizedEmail = client.email ? client.email.trim().toLowerCase() : '';
+
+                let isDuplicate = false;
+                if (normalizedPhone && seenPhones.has(normalizedPhone)) {
+                    isDuplicate = true;
+                }
+                if (normalizedEmail && seenEmails.has(normalizedEmail)) {
+                    isDuplicate = true;
+                }
+
+                if (!isDuplicate) {
+                    uniqueClients.push(client);
+                    if (normalizedPhone) {
+                        seenPhones.add(normalizedPhone);
+                    }
+                    if (normalizedEmail) {
+                        seenEmails.add(normalizedEmail);
+                    }
+                }
+            });
+
+            const removedCount = originalCount - uniqueClients.length;
+            if (removedCount > 0) {
+                clients = uniqueClients;
+                saveToLocalStorage();
+                updateAllDashboards();
+                closeModal(settingsModal);
+                showAlert('success', `${removedCount} cliente(s) duplicado(s) foram removidos com sucesso!`);
+            } else {
+                closeModal(settingsModal);
+                showAlert('info', 'Nenhum cliente duplicado foi encontrado.');
+            }
+        }
 
         function clearSystem() {
             if (confirm('ATENÇÃO: Esta ação irá apagar TODOS os dados do sistema, incluindo clientes e configurações. Tem certeza?')) {
@@ -1111,14 +1154,14 @@
                 ["nome", "telefone", "email", "etapaFunil", "pretensao", "comissao", "tipoImovel", "observacoes", "proximoContato"]
             ];
             const exampleData = [
-                ["João da Silva (Exemplo)", "(11) 98765-4321", "joao.silva@exemplo.com", "lead", "500000", "5", "Apartamento", "Cliente buscando 3 quartos na Zona Sul", "2025-12-31"]
+                ["João da Silva (Exemplo)", "(11) 98765-4321", "joao.silva@exemplo.com", "lead", "R$ 500.000,00", "5", "Apartamento", "Cliente buscando 3 quartos na Zona Sul", "2025-12-31"]
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(templateHeaders.concat(exampleData));
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Clientes");
 
-            const note = `Nota: A coluna 'etapaFunil' deve conter um dos seguintes valores (sem acentos): ${Object.keys(FUNNEL_STAGES).join(', ')}. A coluna 'pretensao' deve ser um número, sem formatação de moeda (ex: 500000.00).`;
+            const note = `Nota: A coluna 'etapaFunil' deve conter um dos seguintes valores (sem acentos): ${Object.keys(FUNNEL_STAGES).join(', ')}.`;
             const noteSheet = XLSX.utils.aoa_to_sheet([["Instruções"], [note]]);
             XLSX.utils.book_append_sheet(wb, noteSheet, "Instruções");
 
@@ -1181,35 +1224,66 @@
                     const importedClients = XLSX.utils.sheet_to_json(worksheet);
                     
                     let importedCount = 0;
+                    let skippedCount = 0;
+
                     importedClients.forEach(newClient => {
-                        if (newClient.nome && newClient.telefone) { // Validação mínima
-                            const clientData = {
-                                id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-                                nome: newClient.nome || '',
-                                telefone: String(newClient.telefone) || '',
-                                email: newClient.email || '',
-                                etapaFunil: newClient.etapaFunil && FUNNEL_STAGES[newClient.etapaFunil.toLowerCase()] ? newClient.etapaFunil.toLowerCase() : 'lead',
-                                pretensao: parseFloat(newClient.pretensao) || null,
-                                comissao: newClient.comissao || '',
-                                tipoImovel: newClient.tipoImovel || '',
-                                observacoes: newClient.observacoes || '',
-                                dataContato: '',
-                                proximoContato: newClient.proximoContato || ''
-                            };
-                            clients.push(clientData);
-                            importedCount++;
+                        // Validação mínima para a linha ser considerada
+                        if (newClient.nome && newClient.telefone) {
+                            const newPhone = String(newClient.telefone).replace(/\D/g, '');
+                            const newEmail = newClient.email ? String(newClient.email).trim().toLowerCase() : null;
+
+                            // Verifica se já existe um cliente com o mesmo telefone ou e-mail
+                            const isDuplicate = clients.some(existingClient => {
+                                const existingPhone = String(existingClient.telefone).replace(/\D/g, '');
+                                const existingEmail = existingClient.email ? String(existingClient.email).trim().toLowerCase() : null;
+
+                                if (existingPhone === newPhone) return true;
+                                if (newEmail && existingEmail && existingEmail === newEmail) return true;
+                                
+                                return false;
+                            });
+
+                            if (isDuplicate) {
+                                skippedCount++;
+                            } else {
+                                // Se não for duplicado, adiciona o cliente
+                                const clientData = {
+                                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                                    nome: newClient.nome || '',
+                                    telefone: String(newClient.telefone) || '',
+                                    email: newClient.email || '',
+                                    etapaFunil: newClient.etapaFunil && FUNNEL_STAGES[newClient.etapaFunil.toLowerCase()] ? newClient.etapaFunil.toLowerCase() : 'lead',
+                                    pretensao: newClient.pretensao || '',
+                                    comissao: newClient.comissao || '',
+                                    tipoImovel: newClient.tipoImovel || '',
+                                    observacoes: newClient.observacoes || '',
+                                    dataContato: '',
+                                    proximoContato: newClient.proximoContato || ''
+                                };
+                                clients.push(clientData);
+                                importedCount++;
+                            }
                         }
                     });
                     
-                    if (importedCount > 0) {
-                        saveToLocalStorage();
-                        updateAllDashboards();
-                        showAlert('success', `${importedCount} cliente(s) importado(s) com sucesso do Excel!`);
+                    if (importedCount > 0 || skippedCount > 0) {
+                        let successMessage = `${importedCount} cliente(s) novo(s) importado(s) com sucesso.`;
+                        if (skippedCount > 0) {
+                            successMessage += ` ${skippedCount} cliente(s) não foram adicionados por já existirem (telefone/e-mail duplicado).`;
+                        }
+                        showAlert('success', successMessage);
+                        
+                        if(importedCount > 0) {
+                            saveToLocalStorage();
+                            updateAllDashboards();
+                        }
+
                     } else {
-                        showAlert('warning', 'Nenhum cliente válido encontrado no arquivo. Verifique se as colunas "nome" e "telefone" estão preenchidas.');
+                        showAlert('warning', 'Nenhum cliente novo encontrado no arquivo. Verifique se os clientes já estão cadastrados ou se as colunas "nome" e "telefone" estão preenchidas.');
                     }
                 } catch (error) {
-                    showAlert('warning', 'Erro ao processar o arquivo Excel.');
+                    console.error("Erro ao importar do Excel: ", error);
+                    showAlert('warning', 'Ocorreu um erro ao processar o arquivo Excel.');
                 }
             };
 
@@ -1254,7 +1328,7 @@
                             <td>${c.nome}</td>
                             <td>${c.telefone}${c.email ? `<br>${c.email}` : ''}</td>
                             <td>${FUNNEL_STAGES[c.etapaFunil]}</td>
-                            <td>${c.pretensao ? formatToBRL(c.pretensao) : 'N/A'}</td>
+                            <td>${c.pretensao || 'N/A'}</td>
                             <td>${c.proximoContato ? new Date(c.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A'}</td>
                         </tr>`).join('')}
                     </tbody></table></body></html>`);
@@ -1298,7 +1372,7 @@
             
             setTimeout(() => {
                 alert.classList.add('hidden');
-            }, 6000);
+            }, 8000); // Aumentado o tempo para mensagens mais longas
         }
 
         function openModal(modal) {
