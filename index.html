@@ -7,8 +7,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
-        /* Paleta de Cores - Tema Imobiliário */
+        /* Paleta de Cores - Tema Imobiliário (sem alterações) */
         :root {
             --primary: #0A2F5B; /* Azul Marinho (confiança, profissionalismo) */
             --primary-dark: #061E3C;
@@ -52,9 +56,21 @@
             border-radius: 0 0 10px 10px;
             box-shadow: 0 4px 12px var(--shadow-color);
             margin-bottom: 30px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         
-        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+        .header-content { 
+            position: relative;
+            z-index: 2;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 20px; 
+        }
+
         .corretor-info { display: flex; align-items: center; gap: 15px; }
         .corretor-logo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
         .corretor-details { display: flex; flex-direction: column; }
@@ -69,7 +85,6 @@
             justify-content: center;
         }
         
-        /* Botões com cores específicas e padronização */
         .btn-primary { background-color: var(--primary); color: white; }
         .btn-primary:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
         .btn-outline { background-color: transparent; border: 1px solid white; color: white; }
@@ -85,7 +100,6 @@
         .btn-finance { background-color: var(--finance); color: white; }
         .btn-finance:hover { background-color: var(--finance-dark); transform: translateY(-2px); }
         
-        /* Padroniza tamanho dos botões no cabeçalho principal */
         header .actions .btn {
             min-width: 170px;
         }
@@ -130,11 +144,7 @@
         tr:hover { background-color: rgba(10, 47, 91, 0.02); }
         
         .badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; text-transform: capitalize; }
-        .badge-lead { background-color: rgba(108, 117, 125, 0.1); color: #6c757d; }
-        .badge-contato { background-color: rgba(23, 162, 184, 0.1); color: var(--info); }
-        .badge-visita { background-color: rgba(226, 132, 19, 0.1); color: var(--warning); }
-        .badge-proposta { background-color: rgba(10, 47, 91, 0.1); color: var(--primary); }
-        .badge-negociacao { background-color: rgba(156, 39, 176, 0.15); color: var(--finance); }
+        .badge-dynamic { background-color: rgba(108, 117, 125, 0.1); color: #6c757d; } /* Default */
         .badge-venda { background-color: rgba(40, 167, 69, 0.1); color: var(--success); }
         .badge-perdido { background-color: rgba(161, 44, 47, 0.1); color: var(--danger); }
         
@@ -174,11 +184,7 @@
         .funnel-stage h4 { font-size: 16px; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); }
         .funnel-stage .count { font-size: 24px; font-weight: 700; display: block; margin-bottom: 5px; }
         .funnel-stage .percentage { font-size: 14px; color: var(--text-light); }
-        .funnel-stage.stage-lead { border-color: #6c757d; }
-        .funnel-stage.stage-contato { border-color: var(--info); }
-        .funnel-stage.stage-visita { border-color: var(--warning); }
-        .funnel-stage.stage-proposta { border-color: var(--primary); }
-        .funnel-stage.stage-negociacao { border-color: var(--finance); }
+        .funnel-stage.stage-dynamic { border-color: #6c757d; }
         .funnel-stage.stage-venda { border-color: var(--success); }
         .funnel-stage.stage-perdido { border-color: var(--danger); }
         
@@ -197,7 +203,6 @@
         .financial-metric .financial-amount.success { color: var(--success); }
         .financial-metric .financial-amount.warning { color: var(--warning); }
         .financial-metric .financial-amount.info { color: var(--primary); }
-        .financial-metric small { font-size: 13px; color: var(--text-light); }
 
         .reports-section .report-options { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         
@@ -213,8 +218,13 @@
         .modal-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
         
         .logo-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); margin-top: 10px; }
-        
-        .finance-page, .clients-page { display: none; }
+        .banner-preview { width: 100%; max-height: 150px; object-fit: cover; border: 2px solid var(--border-color); margin-top: 10px; border-radius: 6px; }
+        .fotos-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+        /* MODIFICADO: Adicionado cursor de ponteiro para fotos */
+        .fotos-preview img { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.2s ease; }
+        .fotos-preview img:hover { transform: scale(1.05); }
+
+        .finance-page, .clients-page, .properties-page { display: none; }
 
         .charts-container {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -226,6 +236,95 @@
             border: 1px solid var(--border-color);
         }
         .chart-wrapper { position: relative; height: 300px; width: 100%; }
+        
+        .view-info-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .view-info-item {
+            background-color: var(--background-light); padding: 12px; border-radius: 6px;
+            border-left: 3px solid var(--primary);
+        }
+        .view-info-item strong {
+            display: block; color: var(--text-light); font-size: 14px; margin-bottom: 4px;
+        }
+        .view-info-item span {
+            font-size: 16px; color: var(--text-dark); word-wrap: break-word;
+        }
+        .view-info-full {
+             grid-column: 1 / -1;
+        }
+
+        /* Estilos do Editor de Funil Dinâmico (sem alterações) */
+        .funnel-editor-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background-color: var(--background-light);
+        }
+        .funnel-editor-item[data-fixed="true"] {
+             background-color: #e9ecef;
+             opacity: 0.8;
+        }
+        .funnel-editor-item input {
+            flex-grow: 1;
+        }
+        .funnel-editor-item input[type="number"] {
+            max-width: 100px;
+        }
+        .funnel-editor-item .actions {
+            flex-shrink: 0;
+            gap: 5px;
+        }
+        .funnel-editor-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .funnel-editor-btn:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+        .funnel-editor-btn i {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+        .funnel-editor-btn.delete-stage i { color: var(--danger); }
+        
+        /* NOVO: Estilos para o Lightbox de Fotos */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .lightbox-close:hover {
+            color: #ccc;
+        }
         
         @media (max-width: 992px) {
             header .actions .btn { min-width: 150px; }
@@ -245,6 +344,11 @@
 <body>
     <input type="file" id="fileInput" class="file-input" accept=".json, .xlsx, .xls">
 
+    <div id="photoLightbox" class="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightboxImg">
+    </div>
+
     <div id="mainPage">
         <header>
             <div class="container header-content">
@@ -256,11 +360,9 @@
                     </div>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-finance show-finance-page"><i class="fas fa-chart-line"></i> Painel Financeiro</button>
+                    <button class="btn btn-primary show-properties-page"><i class="fas fa-building"></i> Painel de Imóveis</button>
                     <button class="btn btn-info show-clients-page"><i class="fas fa-users"></i> Painel de Clientes</button>
-                    <button class="btn btn-success export-data"><i class="fas fa-file-export"></i> Exportar Backup</button>
-                    <button class="btn btn-success import-data-trigger"><i class="fas fa-file-import"></i> Importar Dados</button>
-                    <button class="btn btn-info download-template"><i class="fas fa-file-excel"></i> Baixar Modelo</button>
+                    <button class="btn btn-finance show-finance-page"><i class="fas fa-chart-line"></i> Painel Financeiro</button>
                     <button class="btn btn-warning show-settings"><i class="fas fa-cog"></i> Configurações</button>
                     <a href="https://dinheiroeplanejamento.blogspot.com/" target="_blank" class="btn btn-outline" title="Visitar Blog"><i class="fas fa-blog"></i> Blog</a>
                 </div>
@@ -287,8 +389,16 @@
                     </div>
                 </div>
                 <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
-                <h3 class="goal-title" style="margin-bottom: 20px; text-align: center; font-size: 1.2em;">Funil de Vendas</h3>
+                <h3 class="goal-title" style="margin-bottom: 20px; text-align: center; font-size: 1.2em;">Resumo do Funil de Vendas</h3>
                 <div id="salesFunnel" class="sales-funnel"></div>
+                
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+                <h3 class="goal-title" style="margin-bottom: 20px; text-align: center; font-size: 1.2em;">Gráfico do Funil</h3>
+                <div class="chart-card" style="padding: 10px;">
+                    <div class="chart-wrapper" style="height: 350px;">
+                        <canvas id="mainFunnelChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -306,12 +416,9 @@
                 <div class="actions">
                     <button class="btn btn-outline show-main-page"><i class="fas fa-arrow-left"></i> Voltar ao Início</button>
                     <button id="newClientBtn" class="btn btn-primary"><i class="fas fa-user-plus"></i> Novo Cliente</button>
+                    <button class="btn btn-primary show-properties-page"><i class="fas fa-building"></i> Painel de Imóveis</button>
                     <button class="btn btn-finance show-finance-page"><i class="fas fa-chart-line"></i> Painel Financeiro</button>
-                    <button class="btn btn-success export-data"><i class="fas fa-file-export"></i> Exportar Backup</button>
-                    <button class="btn btn-success import-data-trigger"><i class="fas fa-file-import"></i> Importar Dados</button>
-                    <button class="btn btn-info download-template"><i class="fas fa-file-excel"></i> Baixar Modelo</button>
                     <button class="btn btn-warning show-settings"><i class="fas fa-cog"></i> Configurações</button>
-                    <a href="https://dinheiroeplanejamento.blogspot.com/" target="_blank" class="btn btn-outline" title="Visitar Blog"><i class="fas fa-blog"></i> Blog</a>
                 </div>
             </div>
         </header>
@@ -333,7 +440,7 @@
                 <div class="card-header">
                     <h2 class="card-title"><i class="fas fa-users"></i> Clientes</h2>
                     <div class="actions" style="flex-grow: 1; justify-content: flex-end;">
-                        <input type="text" id="search" class="form-control" placeholder="Pesquisar..." style="width: 250px; min-width: 150px;">
+                        <input type="text" id="searchClient" class="form-control" placeholder="Pesquisar clientes..." style="width: 250px; min-width: 150px;">
                     </div>
                 </div>
                 
@@ -346,8 +453,7 @@
                                 <th>Nome</th>
                                 <th>Contato</th>
                                 <th>Etapa do Funil</th>
-                                <th>Valor Imóvel</th>
-                                <th>Tipo Imóvel</th>
+                                <th>Aniversário</th>
                                 <th>Últ. Contato</th>
                                 <th>Próx. Contato</th>
                                 <th>Ações</th>
@@ -359,6 +465,53 @@
             </div>
         </div>
     </div>
+    
+    <div id="propertiesPage" class="properties-page">
+        <header>
+            <div class="container header-content">
+                <div class="corretor-info">
+                    <img id="corretorLogoProperties" src="" class="corretor-logo" alt="Logo do Corretor">
+                    <div class="corretor-details">
+                        <div id="corretorNameProperties" class="corretor-name">Nome do Corretor</div>
+                        <div id="corretorCreciProperties" class="corretor-creci">CRECI: 000000</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-outline show-main-page"><i class="fas fa-arrow-left"></i> Voltar ao Início</button>
+                    <button id="newPropertyBtn" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Novo Imóvel</button>
+                    <button class="btn btn-info show-clients-page"><i class="fas fa-users"></i> Painel de Clientes</button>
+                    <button class="btn btn-finance show-finance-page"><i class="fas fa-chart-line"></i> Painel Financeiro</button>
+                    <button class="btn btn-warning show-settings"><i class="fas fa-cog"></i> Configurações</button>
+                </div>
+            </div>
+        </header>
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-building"></i> Imóveis Cadastrados</h2>
+                    <div class="actions" style="flex-grow: 1; justify-content: flex-end;">
+                        <input type="text" id="searchProperty" class="form-control" placeholder="Pesquisar imóveis..." style="width: 250px; min-width: 150px;">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="propertiesTable">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Valor de Tabela</th>
+                                <th>Renda Mínima Estimada</th>
+                                <th>Localização</th>
+                                <th>Data de Entrega</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="propertiesList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div id="financePage" class="finance-page">
         <header>
@@ -373,12 +526,9 @@
                 <div class="actions">
                     <button class="btn btn-outline show-main-page"><i class="fas fa-arrow-left"></i> Voltar ao Início</button>
                     <button class="btn btn-info show-clients-page"><i class="fas fa-users"></i> Painel de Clientes</button>
+                    <button class="btn btn-primary show-properties-page"><i class="fas fa-building"></i> Painel de Imóveis</button>
                     <button id="printFinanceBtn" class="btn btn-outline"><i class="fas fa-print"></i> Imprimir Relatório</button>
-                    <button class="btn btn-success export-data"><i class="fas fa-file-export"></i> Exportar Backup</button>
-                    <button class="btn btn-success import-data-trigger"><i class="fas fa-file-import"></i> Importar Dados</button>
-                    <button class="btn btn-info download-template"><i class="fas fa-file-excel"></i> Baixar Modelo</button>
                     <button class="btn btn-warning show-settings"><i class="fas fa-cog"></i> Configurações</button>
-                    <a href="https://dinheiroeplanejamento.blogspot.com/" target="_blank" class="btn btn-outline" title="Visitar Blog"><i class="fas fa-blog"></i> Blog</a>
                 </div>
             </div>
         </header>
@@ -450,13 +600,24 @@
                     </div>
                     <div class="form-row">
                         <div class="form-col"><div class="form-group"><label for="email" class="form-label">E-mail</label><input type="email" id="email" class="form-control"></div></div>
+                        <div class="form-col"><div class="form-group"><label for="dataNascimento" class="form-label">Data de Nascimento</label><input type="date" id="dataNascimento" class="form-control"></div></div>
+                    </div>
+                     <div class="form-row">
                         <div class="form-col"><div class="form-group"><label for="etapaFunil" class="form-label">Etapa do Funil</label><select id="etapaFunil" class="form-control"></select></div></div>
+                        <div class="form-col"><div class="form-group"><label for="renda" class="form-label">Renda Mensal (R$)</label><input type="text" id="renda" class="form-control"></div></div>
                     </div>
                     <div class="form-row">
                         <div class="form-col"><div class="form-group"><label for="pretensao" class="form-label">Valor do Imóvel (R$)</label><input type="text" id="pretensao" class="form-control"></div></div>
                         <div class="form-col"><div class="form-group"><label for="comissao" class="form-label">Comissão (%)</label><input type="number" id="comissao" class="form-control" step="0.1" min="0" placeholder="Ex: 5"></div></div>
                     </div>
-                    <div class="form-group"><label for="tipoImovel" class="form-label">Tipo de Imóvel</label><input type="text" id="tipoImovel" class="form-control" placeholder="Ex: Apartamento, Casa, Terreno"></div>
+                     <div class="form-row">
+                         <div class="form-col"><div class="form-group"><label for="tipoImovel" class="form-label">Tipo de Imóvel (Manual)</label><input type="text" id="tipoImovel" class="form-control" placeholder="Ex: Apartamento, Casa, Terreno"></div></div>
+                         <div class="form-col"><div class="form-group"><label for="imovelInteresse" class="form-label">Imóvel de Interesse (Cadastrado)</label><select id="imovelInteresse" class="form-control"></select></div></div>
+                    </div>
+                    <div id="financeAnalysisSection" class="form-group hidden">
+                        <button type="button" id="analiseFinanciamentoBtn" class="btn btn-info"><i class="fas fa-calculator"></i> Analisar Compatibilidade</button>
+                        <div id="resultadoAnalise" class="alert alert-info hidden" style="margin-top: 15px;"></div>
+                    </div>
                     <div class="form-group"><label for="observacoes" class="form-label">Observações</label><textarea id="observacoes" rows="4" class="form-control"></textarea></div>
                     <div class="form-row">
                         <div class="form-col"><div class="form-group"><label for="dataContato" class="form-label">Último Contato</label><input type="date" id="dataContato" class="form-control"></div></div>
@@ -464,10 +625,74 @@
                     </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
-                        <button type="button" id="cancelForm" class="btn btn-danger"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="button" id="cancelClientForm" class="btn btn-danger"><i class="fas fa-times"></i> Cancelar</button>
                     </div>
-                    <input type="hidden" id="editId">
+                    <input type="hidden" id="editClientId">
                 </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="propertyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="modal-title" id="propertyFormTitle">Novo Imóvel</h2><button class="modal-close">&times;</button></div>
+            <div class="modal-body">
+                <form id="propertyForm">
+                    <div class="form-group"><label for="imovelNome" class="form-label">Nome/Título do Imóvel*</label><input type="text" id="imovelNome" class="form-control" required></div>
+                    <div class="form-row">
+                        <div class="form-col"><div class="form-group"><label for="imovelValorTabela" class="form-label">Valor de Tabela (R$)</label><input type="text" id="imovelValorTabela" class="form-control"></div></div>
+                        <div class="form-col"><div class="form-group"><label for="imovelValorAvaliacao" class="form-label">Valor de Avaliação (R$)</label><input type="text" id="imovelValorAvaliacao" class="form-control"></div></div>
+                    </div>
+                     <div class="form-group" style="background-color: var(--background-light); padding: 15px; border-radius: 6px;">
+                        <label class="form-label">Renda Mínima Estimada para Financiamento</label>
+                        <p id="rendaMinimaEstimada" style="font-weight: bold; font-size: 1.2em; color: var(--primary); margin: 0;">R$ 0,00</p>
+                        <small>Cálculo baseado no valor de tabela e na proporção de financiamento (R$ 4 mil de renda para R$ 200 mil financiados).</small>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col"><div class="form-group"><label for="imovelLocalizacao" class="form-label">Localização</label><input type="text" id="imovelLocalizacao" class="form-control"></div></div>
+                        <div class="form-col"><div class="form-group"><label for="imovelDataEntrega" class="form-label">Data de Entrega</label><input type="date" id="imovelDataEntrega" class="form-control"></div></div>
+                    </div>
+                    <div class="form-group"><label for="imovelCaracteristicas" class="form-label">Características</label><textarea id="imovelCaracteristicas" rows="3" class="form-control" placeholder="Ex: 3 quartos, 1 suíte, 2 vagas, 90m²"></textarea></div>
+                    <div class="form-group"><label for="imovelDiferenciais" class="form-label">Diferenciais</label><textarea id="imovelDiferenciais" rows="3" class="form-control" placeholder="Ex: Varanda gourmet, área de lazer completa, portaria 24h"></textarea></div>
+                    <div class="form-group">
+                        <label for="imovelFotos" class="form-label">Fotos do Imóvel (até 10)</label>
+                        <input type="file" id="imovelFotos" class="form-control" accept="image/*" multiple>
+                        <small class="form-text text-muted">Atenção: Imagens pesadas podem deixar o sistema lento ou exceder o limite de armazenamento do navegador.</small>
+                    </div>
+                    <div id="fotosPreview" class="fotos-preview"></div>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Imóvel</button>
+                        <button type="button" id="cancelPropertyForm" class="btn btn-danger"><i class="fas fa-times"></i> Cancelar</button>
+                    </div>
+                    <input type="hidden" id="editPropertyId">
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="clientViewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="modal-title">Ficha do Cliente</h2><button class="modal-close">&times;</button></div>
+            <div class="modal-body">
+                <div id="clientViewContent" class="view-info-grid"></div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <button id="downloadClientFichaBtn" class="btn btn-success"><i class="fas fa-file-pdf"></i> Baixar Ficha em PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="propertyViewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="modal-title">Ficha do Imóvel</h2><button class="modal-close">&times;</button></div>
+            <div class="modal-body">
+                <div id="propertyViewContent" class="view-info-grid"></div>
+                <hr style="margin: 20px 0;">
+                <h3 style="margin-bottom: 15px;">Fotos</h3>
+                <div id="propertyViewPhotos" class="fotos-preview"></div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <button id="downloadPropertyFichaBtn" class="btn btn-success"><i class="fas fa-file-pdf"></i> Baixar Ficha em PDF</button>
+                </div>
             </div>
         </div>
     </div>
@@ -477,6 +702,12 @@
             <div class="modal-header"><h2 class="modal-title">Configurações</h2><button class="modal-close">&times;</button></div>
             <div class="modal-body">
                 <form id="corretorForm">
+                     <div class="actions" style="margin-bottom: 20px; gap: 15px;">
+                        <button type="button" class="btn btn-success export-data"><i class="fas fa-file-export"></i> Exportar Backup</button>
+                        <button type="button" class="btn btn-success import-data-trigger"><i class="fas fa-file-import"></i> Importar Dados</button>
+                        <button type="button" class="btn btn-info download-template"><i class="fas fa-file-excel"></i> Baixar Modelo</button>
+                    </div>
+                    <hr style="margin: 25px 0;">
                     <div class="form-row">
                         <div class="form-col"><div class="form-group"><label for="corretorNome" class="form-label">Nome*</label><input type="text" id="corretorNome" class="form-control" required></div></div>
                         <div class="form-col"><div class="form-group"><label for="corretorCreciInput" class="form-label">CRECI*</label><input type="text" id="corretorCreciInput" class="form-control" required></div></div>
@@ -496,6 +727,21 @@
 
                     <div class="form-group"><label for="corretorLogoInput" class="form-label">Logo/Marca</label><input type="file" id="corretorLogoInput" class="form-control" accept="image/*"></div>
                     <div class="form-group"><img id="logoPreview" src="" class="logo-preview hidden" alt="Preview da Logo"></div>
+                    
+                    <div class="form-group"><label for="corretorBannerInput" class="form-label">Banner do Cabeçalho</label><input type="file" id="corretorBannerInput" class="form-control" accept="image/*"></div>
+                    <div class="form-group"><img id="bannerPreview" src="" class="banner-preview hidden" alt="Preview do Banner"></div>
+                    
+                    <hr style="margin: 25px 0;">
+                    
+                    <div class="form-group">
+                        <label class="form-label" style="font-size: 1.1em;">Gerenciamento do Funil de Vendas</label>
+                        <p style="font-size: 14px; color: var(--text-light); margin-top: -8px; margin-bottom: 12px;">
+                            Personalize as etapas do seu funil. Edite nomes, defina a probabilidade de conversão para cada etapa e reordene-as conforme sua necessidade.
+                        </p>
+                        <div id="funnelEditor" class="funnel-editor">
+                            </div>
+                        <button type="button" id="addFunnelStageBtn" class="btn btn-primary" style="margin-top: 10px;"><i class="fas fa-plus"></i> Adicionar Nova Etapa</button>
+                    </div>
                     <div class="form-group"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Configurações</button></div>
                     <hr style="margin: 25px 0;">
                     <div class="form-group">
@@ -505,7 +751,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" style="color: var(--danger); font-size: 1.1em;">Zona de Perigo</label>
-                        <p style="font-size: 14px; color: var(--text-light); margin-top: -8px; margin-bottom: 12px;">Cuidado: Esta ação é irreversível e apagará permanentemente todos os dados.</p>
+                        <p style="font-size: 14px; color: var(--text-light); margin-top: -8px; margin-bottom: 12px;">Cuidado: Esta ação é irreversível e apagará permanentemente todos os dados de clientes, imóveis e configurações.</p>
                         <button type="button" id="clearSystemBtn" class="btn btn-danger"><i class="fas fa-bomb"></i> Limpar Sistema</button>
                     </div>
                 </form>
@@ -519,33 +765,94 @@
     </footer>
 
     <script>
-        const FUNNEL_STAGES = {
-            'lead': 'Lead', 'contato': 'Contato Realizado', 'visita': 'Visita Agendada',
-            'proposta': 'Proposta Apresentada', 'negociacao': 'Em Negociação', 'venda': 'Venda Realizada', 'perdido': 'Negócio Perdido'
+        // Fator de financiamento: R$200.000 / R$4.000 = 50.
+        const FINANCING_FACTOR = 50;
+        const MAX_FINANCING_AGE = 80.5; // Idade máxima (80 anos e 6 meses) ao final do contrato
+        const MAX_FINANCING_TERM_YEARS = 35; // Prazo máximo de financiamento em anos (420 meses)
+
+        // Etapas fixas que não podem ser editadas ou removidas pelo usuário
+        const FIXED_STAGES = {
+            'venda': { id: 'venda', name: 'Venda Realizada', probability: 100, isFixed: true },
+            'perdido': { id: 'perdido', name: 'Negócio Perdido', probability: 0, isFixed: true }
         };
 
-        const FUNNEL_PROBABILITIES = {
-            'lead': 5, 'contato': 10, 'visita': 25, 'proposta': 50, 'negociacao': 75
+        // Funções de utilidade para o funil
+        const getFunnelStages = () => corretorData.funnelConfig || [];
+        const getFunnelNamesMap = () => {
+            const map = {};
+            getFunnelStages().forEach(stage => map[stage.id] = stage.name);
+            map.venda = FIXED_STAGES.venda.name;
+            map.perdido = FIXED_STAGES.perdido.name;
+            return map;
         };
+        const getFunnelProbabilitiesMap = () => {
+            const map = {};
+            getFunnelStages().forEach(stage => map[stage.id] = stage.probability);
+            map.venda = FIXED_STAGES.venda.probability;
+            map.perdido = FIXED_STAGES.perdido.probability;
+            return map;
+        };
+        const getAllFunnelStagesWithFixed = () => [...getFunnelStages(), FIXED_STAGES.venda, FIXED_STAGES.perdido];
+
 
         let clients = JSON.parse(localStorage.getItem('prospectClients')) || [];
+        let properties = JSON.parse(localStorage.getItem('prospectProperties')) || [];
         let currentFilter = 'all';
         let corretorData = JSON.parse(localStorage.getItem('corretorData')) || {
-            nome: 'Seu Nome', creci: '000000', telefone: '', logo: '', metaLeads: 20, defaultComissao: 5
+            nome: 'Seu Nome', creci: '000000', telefone: '', logo: '', banner: '', metaLeads: 20, defaultComissao: 5, funnelConfig: []
         };
 
         const clientModal = document.getElementById('clientModal');
+        const propertyModal = document.getElementById('propertyModal');
         const settingsModal = document.getElementById('settingsModal');
-        const searchInput = document.getElementById('search');
+        const clientViewModal = document.getElementById('clientViewModal');
+        const propertyViewModal = document.getElementById('propertyViewModal');
+        // NOVO: Referência ao modal lightbox
+        const photoLightbox = document.getElementById('photoLightbox');
+
+
+        const searchClientInput = document.getElementById('searchClient');
+        const searchPropertyInput = document.getElementById('searchProperty');
         const clientsList = document.getElementById('clientsList');
+        const propertiesList = document.getElementById('propertiesList');
+        
         const mainPage = document.getElementById('mainPage');
         const financePage = document.getElementById('financePage');
         const clientsPage = document.getElementById('clientsPage');
+        const propertiesPage = document.getElementById('propertiesPage');
 
         // Chart instances
-        let funnelChart, revenueChart, monthlyChart, propertyTypeChart;
+        let mainFunnelChart, funnelChart, revenueChart, monthlyChart, propertyTypeChart;
+
+        // Helper Functions
+        const parseCurrency = (value) => parseFloat(String(value || '').replace(/[^\d,]/g, '').replace(',', '.') || 0);
+        const formatToBRL = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const generateUniqueId = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        
+        function calculateAge(birthDateString) {
+            if (!birthDateString) return null;
+            const birthDate = new Date(birthDateString);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
 
         function initialize() {
+            // Migração/Inicialização do funil dinâmico
+            if (!corretorData.funnelConfig || corretorData.funnelConfig.length === 0) {
+                 corretorData.funnelConfig = [
+                    { id: 'lead', name: 'Lead', probability: 5 },
+                    { id: 'contato', name: 'Contato Realizado', probability: 10 },
+                    { id: 'visita', name: 'Visita Agendada', probability: 25 },
+                    { id: 'proposta', name: 'Proposta Apresentada', probability: 50 },
+                    { id: 'negociacao', name: 'Em Negociação', probability: 75 }
+                ];
+                saveToLocalStorage(); // Salva a configuração padrão
+            }
             populateFunnelElements();
             addEventListeners();
             updateAllDashboards();
@@ -558,6 +865,8 @@
             updateSalesFunnel();
             updateFinancialPanel();
             displayClients();
+            displayProperties();
+            updateMainDashboardFunnelChart();
         }
 
         function populateFunnelElements() {
@@ -569,20 +878,30 @@
             reportFunnelSelect.innerHTML = '<option value="">Selecionar Etapa para Relatório</option>';
             funnelFilter.innerHTML = '';
             
-            for (const [key, value] of Object.entries(FUNNEL_STAGES)) {
-                etapaFunilSelect.innerHTML += `<option value="${key}">${value}</option>`;
-                reportFunnelSelect.innerHTML += `<option value="${key}">${value}</option>`;
-            }
+            const allStages = getAllFunnelStagesWithFixed();
+            allStages.forEach(stage => {
+                etapaFunilSelect.innerHTML += `<option value="${stage.id}">${stage.name}</option>`;
+                reportFunnelSelect.innerHTML += `<option value="${stage.id}">${stage.name}</option>`;
+            });
             
             funnelFilter.innerHTML += `<button class="funnel-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">Todos</button>`;
-            for (const [key, value] of Object.entries(FUNNEL_STAGES)) {
-                funnelFilter.innerHTML += `<button class="funnel-filter-btn ${currentFilter === key ? 'active' : ''}" data-filter="${key}">${value}</button>`;
-            }
+            allStages.forEach(stage => {
+                 funnelFilter.innerHTML += `<button class="funnel-filter-btn ${currentFilter === stage.id ? 'active' : ''}" data-filter="${stage.id}">${stage.name}</button>`;
+            });
+        }
+        
+        function populatePropertiesDropdown() {
+            const select = document.getElementById('imovelInteresse');
+            select.innerHTML = '<option value="">Nenhum</option>';
+            properties.forEach(prop => {
+                select.innerHTML += `<option value="${prop.id}">${prop.nome}</option>`;
+            });
         }
 
         function addEventListeners() {
             // Botões com IDs únicos
             document.getElementById('newClientBtn').addEventListener('click', () => showClientForm());
+            document.getElementById('newPropertyBtn').addEventListener('click', () => showPropertyForm());
             document.getElementById('fileInput').addEventListener('change', importData);
             document.getElementById('printFinanceBtn').addEventListener('click', printFinanceReport);
             document.getElementById('reportAllClientsBtn').addEventListener('click', () => printReport('all'));
@@ -594,15 +913,27 @@
                 document.getElementById('reportFunnelBtn').disabled = !this.value;
             });
             document.getElementById('clientForm').addEventListener('submit', saveClient);
+            document.getElementById('propertyForm').addEventListener('submit', saveProperty);
             document.getElementById('corretorForm').addEventListener('submit', saveCorretorData);
-            document.getElementById('cancelForm').addEventListener('click', () => closeModal(clientModal));
+            document.getElementById('cancelClientForm').addEventListener('click', () => closeModal(clientModal));
+            document.getElementById('cancelPropertyForm').addEventListener('click', () => closeModal(propertyModal));
             document.getElementById('clearSystemBtn').addEventListener('click', clearSystem);
-            document.getElementById('removeDuplicatesBtn').addEventListener('click', removeDuplicates); // NOVO EVENTO
+            document.getElementById('removeDuplicatesBtn').addEventListener('click', removeDuplicates);
+            document.getElementById('addFunnelStageBtn').addEventListener('click', addFunnelStageEditor);
+            document.getElementById('imovelFotos').addEventListener('change', previewPropertyPhotos);
+            document.getElementById('analiseFinanciamentoBtn').addEventListener('click', analyzeFinancingCompatibility);
+            document.getElementById('imovelInteresse').addEventListener('change', toggleFinanceAnalysisSection);
+            
+            // NOVO: Listeners para download de fichas
+            document.getElementById('downloadClientFichaBtn').addEventListener('click', downloadClientFicha);
+            document.getElementById('downloadPropertyFichaBtn').addEventListener('click', downloadPropertyFicha);
+
 
             // Botões de navegação e ação (usando classes)
             document.querySelectorAll('.show-main-page').forEach(btn => btn.addEventListener('click', showMainPage));
             document.querySelectorAll('.show-finance-page').forEach(btn => btn.addEventListener('click', showFinancePage));
             document.querySelectorAll('.show-clients-page').forEach(btn => btn.addEventListener('click', showClientsPage));
+            document.querySelectorAll('.show-properties-page').forEach(btn => btn.addEventListener('click', showPropertiesPage));
             document.querySelectorAll('.export-data').forEach(btn => btn.addEventListener('click', exportData));
             document.querySelectorAll('.import-data-trigger').forEach(btn => btn.addEventListener('click', () => document.getElementById('fileInput').click()));
             document.querySelectorAll('.download-template').forEach(btn => btn.addEventListener('click', downloadExcelTemplate));
@@ -610,8 +941,7 @@
             
             document.querySelectorAll('.modal-close').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    if (btn.closest('.modal') === clientModal) closeModal(clientModal);
-                    if (btn.closest('.modal') === settingsModal) closeModal(settingsModal);
+                    closeModal(btn.closest('.modal'));
                 });
             });
             
@@ -619,7 +949,9 @@
                 btn.addEventListener('click', () => btn.closest('.alert').classList.add('hidden'));
             });
             
-            searchInput.addEventListener('input', displayClients);
+            searchClientInput.addEventListener('input', displayClients);
+            searchPropertyInput.addEventListener('input', displayProperties);
+
             document.addEventListener('click', (e) => {
                 const filterButton = e.target.closest('.funnel-filter-btn');
                 if (filterButton) {
@@ -629,23 +961,73 @@
                     displayClients();
                 }
                 
-                const actionButton = e.target.closest('.action-btn');
-                if (actionButton) {
-                    const action = actionButton.dataset.action;
-                    const id = actionButton.dataset.id;
-                    
+                // Ações para Clientes
+                const clientActionBtn = e.target.closest('#clientsList .action-btn');
+                if (clientActionBtn) {
+                    const action = clientActionBtn.dataset.action;
+                    const id = clientActionBtn.dataset.id;
                     if (action === 'edit') editClient(id);
                     if (action === 'delete') deleteClient(id);
                     if (action === 'whatsapp') contactWhatsApp(id);
+                    if (action === 'view') showClientView(id);
+                }
+
+                // Ações para Imóveis
+                const propertyActionBtn = e.target.closest('#propertiesList .action-btn');
+                if (propertyActionBtn) {
+                    const action = propertyActionBtn.dataset.action;
+                    const id = propertyActionBtn.dataset.id;
+                    if (action === 'edit') editProperty(id);
+                    if (action === 'delete') deleteProperty(id);
+                    if (action === 'view') showPropertyView(id);
+                }
+
+                // Event Listeners for Funnel Editor
+                const funnelEditor = e.target.closest('.funnel-editor-btn');
+                if(funnelEditor){
+                    const item = funnelEditor.closest('.funnel-editor-item');
+                    const index = Array.from(item.parentNode.children).indexOf(item);
+
+                    if(funnelEditor.classList.contains('delete-stage')){
+                        item.remove();
+                    } else if (funnelEditor.classList.contains('move-up') && index > 0) {
+                        item.parentNode.insertBefore(item, item.previousElementSibling);
+                    } else if (funnelEditor.classList.contains('move-down') && index < item.parentNode.children.length - 1) {
+                        item.parentNode.insertBefore(item.nextElementSibling, item);
+                    }
+                }
+
+                // NOVO: Listener para abrir o lightbox
+                const photoToView = e.target.closest('.fotos-preview img');
+                if (photoToView) {
+                    openLightbox(photoToView.src);
                 }
             });
             
+            // NOVO: Listeners para fechar o lightbox
+            photoLightbox.addEventListener('click', (e) => {
+                if (e.target.id === 'photoLightbox' || e.target.classList.contains('lightbox-close')) {
+                    closeLightbox();
+                }
+            });
+
             document.getElementById('corretorLogoInput').addEventListener('change', function() {
                 if (this.files && this.files[0]) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         document.getElementById('logoPreview').src = e.target.result;
                         document.getElementById('logoPreview').classList.remove('hidden');
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            document.getElementById('corretorBannerInput').addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('bannerPreview').src = e.target.result;
+                        document.getElementById('bannerPreview').classList.remove('hidden');
                     }
                     reader.readAsDataURL(this.files[0]);
                 }
@@ -668,7 +1050,7 @@
                 e.target.value = value;
             };
 
-            const formatCurrency = (e) => {
+            const formatCurrencyInput = (e) => {
                 let value = e.target.value.replace(/\D/g, '');
                 if (value === '') {
                     e.target.value = '';
@@ -680,19 +1062,26 @@
             
             document.getElementById('telefone').addEventListener('input', formatPhone);
             document.getElementById('corretorTelefone').addEventListener('input', formatPhone);
-            document.getElementById('pretensao').addEventListener('input', formatCurrency);
+            document.getElementById('pretensao').addEventListener('input', formatCurrencyInput);
+            document.getElementById('renda').addEventListener('input', formatCurrencyInput);
+            document.getElementById('imovelValorTabela').addEventListener('input', formatCurrencyInput);
+            document.getElementById('imovelValorTabela').addEventListener('input', updateEstimatedMinIncome);
+            document.getElementById('imovelValorAvaliacao').addEventListener('input', formatCurrencyInput);
         }
 
+        // Funções de navegação (sem alterações)
         function showMainPage() {
             mainPage.style.display = 'block';
             financePage.style.display = 'none';
             clientsPage.style.display = 'none';
+            propertiesPage.style.display = 'none';
         }
 
         function showFinancePage() {
             mainPage.style.display = 'none';
             financePage.style.display = 'block';
             clientsPage.style.display = 'none';
+            propertiesPage.style.display = 'none';
             updateFinancialCharts();
         }
 
@@ -700,20 +1089,34 @@
             mainPage.style.display = 'none';
             financePage.style.display = 'none';
             clientsPage.style.display = 'block';
+            propertiesPage.style.display = 'none';
         }
 
+        function showPropertiesPage() {
+            mainPage.style.display = 'none';
+            financePage.style.display = 'none';
+            clientsPage.style.display = 'none';
+            propertiesPage.style.display = 'block';
+        }
+
+        // Funções de atualização de dashboards (sem alterações)
         function updateCorretorInfo() {
-            document.getElementById('corretorName').textContent = corretorData.nome;
-            document.getElementById('corretorCreci').textContent = `CRECI: ${corretorData.creci}`;
-            document.getElementById('corretorNameFinance').textContent = corretorData.nome;
-            document.getElementById('corretorCreciFinance').textContent = `CRECI: ${corretorData.creci}`;
-            document.getElementById('corretorNameClients').textContent = corretorData.nome;
-            document.getElementById('corretorCreciClients').textContent = `CRECI: ${corretorData.creci}`;
-            
-            const logoSrc = corretorData.logo || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Transparent pixel
-            document.getElementById('corretorLogo').src = logoSrc;
-            document.getElementById('corretorLogoFinance').src = logoSrc;
-            document.getElementById('corretorLogoClients').src = logoSrc;
+            const commonName = corretorData.nome;
+            const commonCreci = `CRECI: ${corretorData.creci}`;
+            const commonLogo = corretorData.logo || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+            document.querySelectorAll('.corretor-name').forEach(el => el.textContent = commonName);
+            document.querySelectorAll('.corretor-creci').forEach(el => el.textContent = commonCreci);
+            document.querySelectorAll('.corretor-logo').forEach(el => el.src = commonLogo);
+
+            const overlayGradient = 'linear-gradient(135deg, rgba(6, 30, 60, 0.85), rgba(10, 47, 91, 0.75))';
+            document.querySelectorAll('header').forEach(header => {
+                if (corretorData.banner) {
+                    header.style.backgroundImage = `${overlayGradient}, url('${corretorData.banner}')`;
+                } else {
+                    header.style.backgroundImage = ''; 
+                }
+            });
         }
 
         function updateGoalProgress() {
@@ -738,23 +1141,23 @@
             const activeClients = clients.filter(c => c.etapaFunil !== 'venda' && c.etapaFunil !== 'perdido');
             const totalActive = activeClients.length;
 
-            for (const [key, label] of Object.entries(FUNNEL_STAGES)) {
-                const count = clients.filter(c => c.etapaFunil === key).length;
-                const percentage = totalActive > 0 && (key !== 'venda' && key !== 'perdido') ? Math.round((count / totalActive) * 100) : 0;
-                const percentageText = (key !== 'venda' && key !== 'perdido') ? `${percentage}% dos ativos` : `Total: ${count}`;
-                
-                funnelContainer.innerHTML += `
-                    <div class="funnel-stage stage-${key}">
-                        <h4>${label}</h4>
+            getAllFunnelStagesWithFixed().forEach(stage => {
+                 const count = clients.filter(c => c.etapaFunil === stage.id).length;
+                const percentage = totalActive > 0 && !stage.isFixed ? Math.round((count / totalActive) * 100) : 0;
+                const percentageText = !stage.isFixed ? `${percentage}% dos ativos` : `Total: ${count}`;
+                 
+                 funnelContainer.innerHTML += `
+                    <div class="funnel-stage stage-${stage.isFixed ? stage.id : 'dynamic'}">
+                        <h4>${stage.name}</h4>
                         <span class="count">${count}</span>
                         <span class="percentage">${percentageText}</span>
                     </div>
                 `;
-            }
+            });
         }
 
         function updateFinancialPanel() {
-             const parseCurrency = (value) => parseFloat(value?.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+             const funnelProbabilities = getFunnelProbabilitiesMap();
 
             const realizedRevenue = clients
                 .filter(c => c.etapaFunil === 'venda')
@@ -769,7 +1172,7 @@
                 .reduce((sum, client) => {
                     const propertyValue = parseCurrency(client.pretensao);
                     const commissionRate = (parseFloat(client.comissao) || corretorData.defaultComissao || 5) / 100;
-                    const probability = FUNNEL_PROBABILITIES[client.etapaFunil] || 0;
+                    const probability = funnelProbabilities[client.etapaFunil] || 0;
                     return sum + (propertyValue * commissionRate * probability / 100);
                 }, 0);
             
@@ -781,10 +1184,52 @@
                     return sum + (propertyValue * commissionRate);
                 }, 0);
             
-            const formatToBRL = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('realizedRevenue').textContent = formatToBRL(realizedRevenue);
             document.getElementById('revenueForecast').textContent = formatToBRL(revenueForecast);
             document.getElementById('potentialRevenue').textContent = formatToBRL(potentialRevenue);
+        }
+
+        function updateMainDashboardFunnelChart() {
+            if (mainFunnelChart) mainFunnelChart.destroy();
+
+            const allStages = getAllFunnelStagesWithFixed();
+            const funnelData = allStages.map(stage => clients.filter(c => c.etapaFunil === stage.id).length);
+
+            const funnelCtx = document.getElementById('mainFunnelChart').getContext('2d');
+            mainFunnelChart = new Chart(funnelCtx, {
+                type: 'bar',
+                data: {
+                    labels: allStages.map(s => s.name),
+                    datasets: [{
+                        label: 'Clientes por Etapa',
+                        data: funnelData,
+                        backgroundColor: ['#6c757d', '#17a2b8', '#E28413', '#0A2F5B', '#9C27B0', '#FFC107', '#DC3545', '#28a745', '#A12C2F'],
+                        borderColor: 'rgba(0, 0, 0, 0.1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function updateFinancialCharts() {
@@ -793,15 +1238,14 @@
             if (monthlyChart) monthlyChart.destroy();
             if (propertyTypeChart) propertyTypeChart.destroy();
             
-            const parseCurrency = (value) => parseFloat(value?.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+            const funnelProbabilities = getFunnelProbabilitiesMap();
+            const allStages = getAllFunnelStagesWithFixed();
 
-            const funnelData = Object.keys(FUNNEL_STAGES).map(key => 
-                clients.filter(c => c.etapaFunil === key).length
-            );
+            const funnelData = allStages.map(stage => clients.filter(c => c.etapaFunil === stage.id).length);
             
             const realized = clients.filter(c => c.etapaFunil === 'venda').reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100)), 0);
-            const forecast = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100) * (FUNNEL_PROBABILITIES[c.etapaFunil]/100)), 0);
-            const potential = clients.filter(c => FUNNEL_PROBABILITIES[c.etapaFunil]).reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100)), 0) - forecast;
+            const forecast = clients.filter(c => funnelProbabilities[c.etapaFunil]).reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100) * (funnelProbabilities[c.etapaFunil]/100)), 0);
+            const potential = clients.filter(c => funnelProbabilities[c.etapaFunil]).reduce((sum, c) => sum + (parseCurrency(c.pretensao) * ((parseFloat(c.comissao) || corretorData.defaultComissao)/100)), 0) - forecast;
             
             const propertyTypes = {};
             clients.forEach(client => {
@@ -815,7 +1259,7 @@
             funnelChart = new Chart(funnelCtx, {
                 type: 'bar',
                 data: {
-                    labels: Object.values(FUNNEL_STAGES),
+                    labels: allStages.map(s => s.name),
                     datasets: [{
                         label: 'Clientes por Etapa',
                         data: funnelData,
@@ -869,9 +1313,11 @@
             });
         }
 
+        // Funções de exibição (sem alterações)
         function displayClients() {
-            const searchTerm = searchInput.value.toLowerCase();
+            const searchTerm = searchClientInput.value.toLowerCase();
             let filteredClients = clients;
+            const funnelNames = getFunnelNamesMap();
             
             if (currentFilter !== 'all') {
                 filteredClients = filteredClients.filter(c => c.etapaFunil === currentFilter);
@@ -889,28 +1335,30 @@
             clientsList.innerHTML = '';
             
             if (filteredClients.length === 0) {
-                clientsList.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 20px;">Nenhum cliente encontrado</td></tr>`;
+                clientsList.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">Nenhum cliente encontrado</td></tr>`;
                 return;
             }
             
             filteredClients.forEach(client => {
-                const propertyValue = client.pretensao || 'Não informado';
-                const propertyType = client.tipoImovel || 'Não informado';
                 const lastContact = client.dataContato ? new Date(client.dataContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Nunca';
                 const nextContact = client.proximoContato ? new Date(client.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não agendado';
-                
+                const birthday = client.dataNascimento ? new Date(client.dataNascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não informado';
+                const age = calculateAge(client.dataNascimento);
+                const birthdayText = age ? `${birthday} (${age} anos)` : birthday;
+
                 const isTodayContact = client.proximoContato === new Date().toISOString().split('T')[0];
-                
+                const badgeClass = FIXED_STAGES[client.etapaFunil] ? `badge-${client.etapaFunil}` : 'badge-dynamic';
+
                 clientsList.innerHTML += `
                     <tr ${isTodayContact ? 'class="today-contact"' : ''}>
                         <td>${client.nome}</td>
                         <td>${client.telefone}${client.email ? `<br><small>${client.email}</small>` : ''}</td>
-                        <td><span class="badge badge-${client.etapaFunil}">${FUNNEL_STAGES[client.etapaFunil]}</span></td>
-                        <td>${propertyValue}</td>
-                        <td>${propertyType}</td>
+                        <td><span class="badge ${badgeClass}">${funnelNames[client.etapaFunil] || client.etapaFunil}</span></td>
+                        <td>${birthdayText}</td>
                         <td>${lastContact}</td>
                         <td>${nextContact}</td>
                         <td>
+                            <button class="action-btn" data-action="view" data-id="${client.id}" title="Visualizar Ficha"><i class="fas fa-eye"></i></button>
                             <button class="action-btn" data-action="whatsapp" data-id="${client.id}" title="Contatar via WhatsApp"><i class="fab fa-whatsapp"></i></button>
                             <button class="action-btn" data-action="edit" data-id="${client.id}" title="Editar"><i class="fas fa-edit"></i></button>
                             <button class="action-btn" data-action="delete" data-id="${client.id}" title="Excluir"><i class="fas fa-trash"></i></button>
@@ -919,51 +1367,91 @@
                 `;
             });
         }
+        
+        function displayProperties() {
+            const searchTerm = searchPropertyInput.value.toLowerCase();
+            let filteredProperties = properties;
 
+            if (searchTerm) {
+                filteredProperties = filteredProperties.filter(p =>
+                    p.nome.toLowerCase().includes(searchTerm) ||
+                    (p.localizacao && p.localizacao.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            propertiesList.innerHTML = '';
+
+            if (filteredProperties.length === 0) {
+                propertiesList.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">Nenhum imóvel encontrado</td></tr>`;
+                return;
+            }
+
+            filteredProperties.forEach(prop => {
+                const deliveryDate = prop.dataEntrega ? new Date(prop.dataEntrega).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não informada';
+                const propertyValue = parseCurrency(prop.valorTabela);
+                const minIncome = propertyValue > 0 ? formatToBRL(propertyValue / FINANCING_FACTOR) : 'N/A';
+                
+                propertiesList.innerHTML += `
+                    <tr>
+                        <td>${prop.nome}</td>
+                        <td>${prop.valorTabela || 'Não informado'}</td>
+                        <td>${minIncome}</td>
+                        <td>${prop.localizacao || 'Não informada'}</td>
+                        <td>${deliveryDate}</td>
+                        <td>
+                            <button class="action-btn" data-action="view" data-id="${prop.id}" title="Visualizar Ficha"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn" data-action="edit" data-id="${prop.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn" data-action="delete" data-id="${prop.id}" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Funções de CRUD de Clientes e Imóveis (sem grandes alterações)
         function showClientForm(client = null) {
             document.getElementById('clientForm').reset();
+            populatePropertiesDropdown();
             document.getElementById('formTitle').textContent = client ? 'Editar Cliente' : 'Novo Cliente';
-            document.getElementById('editId').value = client ? client.id : '';
+            document.getElementById('editClientId').value = client ? client.id : '';
             
             if (client) {
                 document.getElementById('nome').value = client.nome || '';
                 document.getElementById('telefone').value = client.telefone || '';
                 document.getElementById('email').value = client.email || '';
-                document.getElementById('etapaFunil').value = client.etapaFunil || 'lead';
+                document.getElementById('dataNascimento').value = client.dataNascimento || '';
+                document.getElementById('etapaFunil').value = client.etapaFunil || (getFunnelStages()[0]?.id || 'lead');
+                document.getElementById('renda').value = client.renda || '';
                 document.getElementById('pretensao').value = client.pretensao || '';
                 document.getElementById('comissao').value = client.comissao || corretorData.defaultComissao || '';
                 document.getElementById('tipoImovel').value = client.tipoImovel || '';
+                document.getElementById('imovelInteresse').value = client.propertyId || '';
                 document.getElementById('observacoes').value = client.observacoes || '';
                 document.getElementById('dataContato').value = client.dataContato || '';
                 document.getElementById('proximoContato').value = client.proximoContato || '';
             } else {
                 document.getElementById('comissao').value = corretorData.defaultComissao || '';
-                document.getElementById('etapaFunil').value = 'lead';
+                document.getElementById('etapaFunil').value = getFunnelStages()[0]?.id || 'lead';
             }
             
+            toggleFinanceAnalysisSection();
             openModal(clientModal);
         }
 
         function saveClient(e) {
             e.preventDefault();
             
-            const clientId = document.getElementById('editId').value;
+            const clientId = document.getElementById('editClientId').value;
             const nome = document.getElementById('nome').value;
             const telefone = document.getElementById('telefone').value;
             const email = document.getElementById('email').value.trim().toLowerCase();
 
-            // Validação de duplicidade
             const normalizedPhone = telefone.replace(/\D/g, '');
             const isDuplicate = clients.find(client => {
                 const existingNormalizedPhone = client.telefone.replace(/\D/g, '');
                 const existingEmail = client.email ? client.email.trim().toLowerCase() : '';
                 
-                // Ignora o próprio cliente na verificação durante a edição
-                if (client.id === clientId) {
-                    return false;
-                }
-                
-                // Verifica se o telefone ou o e-mail (se não for vazio) já existe
+                if (client.id === clientId) return false;
                 if (existingNormalizedPhone === normalizedPhone) return true;
                 if (email && existingEmail && existingEmail === email) return true;
                 
@@ -976,14 +1464,17 @@
             }
 
             const clientData = {
-                id: clientId || Date.now().toString(),
+                id: clientId || generateUniqueId(),
                 nome: nome,
                 telefone: telefone,
                 email: document.getElementById('email').value,
+                dataNascimento: document.getElementById('dataNascimento').value,
                 etapaFunil: document.getElementById('etapaFunil').value,
+                renda: document.getElementById('renda').value,
                 pretensao: document.getElementById('pretensao').value,
                 comissao: document.getElementById('comissao').value,
                 tipoImovel: document.getElementById('tipoImovel').value,
+                propertyId: document.getElementById('imovelInteresse').value,
                 observacoes: document.getElementById('observacoes').value,
                 dataContato: document.getElementById('dataContato').value,
                 proximoContato: document.getElementById('proximoContato').value
@@ -991,9 +1482,7 @@
             
             if (clientId) {
                 const index = clients.findIndex(c => c.id === clientId);
-                if (index !== -1) {
-                    clients[index] = clientData;
-                }
+                if (index !== -1) clients[index] = clientData;
             } else {
                 clients.push(clientData);
             }
@@ -1018,7 +1507,192 @@
                 showAlert('success', 'Cliente excluído com sucesso!');
             }
         }
+        
+        function showPropertyForm(property = null) {
+            document.getElementById('propertyForm').reset();
+            document.getElementById('fotosPreview').innerHTML = '';
+            document.getElementById('propertyFormTitle').textContent = property ? 'Editar Imóvel' : 'Novo Imóvel';
+            document.getElementById('editPropertyId').value = property ? property.id : '';
 
+            if (property) {
+                document.getElementById('imovelNome').value = property.nome || '';
+                document.getElementById('imovelValorTabela').value = property.valorTabela || '';
+                document.getElementById('imovelValorAvaliacao').value = property.valorAvaliacao || '';
+                document.getElementById('imovelLocalizacao').value = property.localizacao || '';
+                document.getElementById('imovelDataEntrega').value = property.dataEntrega || '';
+                document.getElementById('imovelCaracteristicas').value = property.caracteristicas || '';
+                document.getElementById('imovelDiferenciais').value = property.diferenciais || '';
+                if (property.fotos && property.fotos.length > 0) {
+                    const previewContainer = document.getElementById('fotosPreview');
+                    property.fotos.forEach(fotoSrc => {
+                        previewContainer.innerHTML += `<img src="${fotoSrc}" alt="Preview do Imóvel">`;
+                    });
+                }
+            }
+            updateEstimatedMinIncome(); // Atualiza a renda mínima ao abrir o modal
+            openModal(propertyModal);
+        }
+        
+        async function saveProperty(e) {
+            e.preventDefault();
+            const propertyId = document.getElementById('editPropertyId').value;
+            const fotosInput = document.getElementById('imovelFotos');
+            
+            const readFilesAsBase64 = (files) => {
+                const filePromises = Array.from(files).map(file => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = error => reject(error);
+                        reader.readAsDataURL(file);
+                    });
+                });
+                return Promise.all(filePromises);
+            };
+            
+            let newFotos = [];
+            if (fotosInput.files.length > 0) {
+                if(fotosInput.files.length > 10){
+                    showAlert('warning', 'Você pode selecionar no máximo 10 fotos.');
+                    return;
+                }
+                newFotos = await readFilesAsBase64(fotosInput.files);
+            }
+
+            let finalFotos = newFotos;
+            if(propertyId && newFotos.length === 0){ // Mantém fotos antigas se nenhuma nova for enviada
+                const existingProperty = properties.find(p => p.id === propertyId);
+                finalFotos = existingProperty.fotos || [];
+            }
+
+            const propertyData = {
+                id: propertyId || generateUniqueId(),
+                nome: document.getElementById('imovelNome').value,
+                valorTabela: document.getElementById('imovelValorTabela').value,
+                valorAvaliacao: document.getElementById('imovelValorAvaliacao').value,
+                localizacao: document.getElementById('imovelLocalizacao').value,
+                dataEntrega: document.getElementById('imovelDataEntrega').value,
+                caracteristicas: document.getElementById('imovelCaracteristicas').value,
+                diferenciais: document.getElementById('imovelDiferenciais').value,
+                fotos: finalFotos
+            };
+
+            if (propertyId) {
+                const index = properties.findIndex(p => p.id === propertyId);
+                if (index !== -1) properties[index] = propertyData;
+            } else {
+                properties.push(propertyData);
+            }
+
+            saveToLocalStorage();
+            closeModal(propertyModal);
+            updateAllDashboards();
+            showAlert('success', `Imóvel ${propertyId ? 'atualizado' : 'adicionado'} com sucesso!`);
+        }
+
+        function editProperty(id) {
+            const property = properties.find(p => p.id === id);
+            if (property) showPropertyForm(property);
+        }
+
+        function deleteProperty(id) {
+            if (confirm('Tem certeza que deseja excluir este imóvel? Esta ação também removerá a associação com qualquer cliente.')) {
+                properties = properties.filter(p => p.id !== id);
+                // Remove a referência do imóvel nos clientes
+                clients.forEach(client => {
+                    if (client.propertyId === id) {
+                        client.propertyId = '';
+                    }
+                });
+                saveToLocalStorage();
+                updateAllDashboards();
+                showAlert('success', 'Imóvel excluído com sucesso!');
+            }
+        }
+        
+        function previewPropertyPhotos() {
+            const previewContainer = document.getElementById('fotosPreview');
+            const files = document.getElementById('imovelFotos').files;
+            previewContainer.innerHTML = '';
+            if (files.length > 10) {
+                 showAlert('warning', 'Você pode selecionar no máximo 10 fotos. Apenas as 10 primeiras serão exibidas.');
+            }
+            Array.from(files).slice(0, 10).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewContainer.innerHTML += `<img src="${e.target.result}" alt="Preview do Imóvel">`;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Funções de Visualização de Ficha (View Modals)
+        function showClientView(id) {
+            const client = clients.find(c => c.id === id);
+            if (!client) return;
+
+            const content = document.getElementById('clientViewContent');
+            const property = properties.find(p => p.id === client.propertyId);
+            const funnelNames = getFunnelNamesMap();
+            const age = calculateAge(client.dataNascimento);
+            
+            // Adiciona o ID do cliente ao botão de download para ser usado posteriormente
+            document.getElementById('downloadClientFichaBtn').dataset.clientId = id;
+
+            content.innerHTML = `
+                <div class="view-info-item view-info-full"><strong>Nome</strong><span>${client.nome || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Telefone</strong><span>${client.telefone || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>E-mail</strong><span>${client.email || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Data de Nascimento</strong><span>${client.dataNascimento ? new Date(client.dataNascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Idade</strong><span>${age ? `${age} anos` : 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Etapa do Funil</strong><span>${funnelNames[client.etapaFunil] || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Renda Mensal</strong><span>${client.renda || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Imóvel de Interesse</strong><span>${property ? property.nome : (client.tipoImovel || 'Não especificado')}</span></div>
+                <div class="view-info-item"><strong>Valor Pretendido</strong><span>${client.pretensao || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Último Contato</strong><span>${client.dataContato ? new Date(client.dataContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Próximo Contato</strong><span>${client.proximoContato ? new Date(client.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não informado'}</span></div>
+                <div class="view-info-item view-info-full"><strong>Observações</strong><span>${client.observacoes || 'Nenhuma'}</span></div>
+            `;
+            openModal(clientViewModal);
+        }
+
+        function showPropertyView(id) {
+            const property = properties.find(p => p.id === id);
+            if (!property) return;
+            
+            const content = document.getElementById('propertyViewContent');
+            const photos = document.getElementById('propertyViewPhotos');
+            
+            const propertyValue = parseCurrency(property.valorTabela);
+            const minIncome = propertyValue > 0 ? formatToBRL(propertyValue / FINANCING_FACTOR) : 'Não calculado';
+
+            // Adiciona o ID do imóvel ao botão de download
+            document.getElementById('downloadPropertyFichaBtn').dataset.propertyId = id;
+
+            content.innerHTML = `
+                <div class="view-info-item view-info-full"><strong>Nome do Imóvel</strong><span>${property.nome || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Valor de Tabela</strong><span>${property.valorTabela || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Valor de Avaliação</strong><span>${property.valorAvaliacao || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Renda Mínima Estimada</strong><span>${minIncome}</span></div>
+                <div class="view-info-item"><strong>Localização</strong><span>${property.localizacao || 'Não informado'}</span></div>
+                <div class="view-info-item"><strong>Data de Entrega</strong><span>${property.dataEntrega ? new Date(property.dataEntrega).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não informado'}</span></div>
+                <div class="view-info-item view-info-full"><strong>Características</strong><span>${property.caracteristicas || 'Nenhuma'}</span></div>
+                <div class="view-info-item view-info-full"><strong>Diferenciais</strong><span>${property.diferenciais || 'Nenhum'}</span></div>
+            `;
+            
+            photos.innerHTML = '';
+            if (property.fotos && property.fotos.length > 0) {
+                property.fotos.forEach(src => {
+                    photos.innerHTML += `<img src="${src}" alt="Foto do imóvel">`;
+                });
+            } else {
+                photos.innerHTML = '<p>Nenhuma foto cadastrada.</p>';
+            }
+
+            openModal(propertyViewModal);
+        }
+
+        // Funções de Contato, Alertas e Configurações (sem grandes alterações)
         function contactWhatsApp(id) {
             const clientIndex = clients.findIndex(c => c.id === id);
             if (clientIndex > -1) {
@@ -1063,41 +1737,140 @@
                 document.getElementById('logoPreview').classList.add('hidden');
             }
             
+            if (corretorData.banner) {
+                document.getElementById('bannerPreview').src = corretorData.banner;
+                document.getElementById('bannerPreview').classList.remove('hidden');
+            } else {
+                document.getElementById('bannerPreview').classList.add('hidden');
+            }
+            renderFunnelEditor();
             openModal(settingsModal);
         }
 
+        function renderFunnelEditor() {
+            const editor = document.getElementById('funnelEditor');
+            editor.innerHTML = '';
+            getFunnelStages().forEach(stage => {
+                editor.appendChild(createFunnelStageEditorItem(stage));
+            });
+
+             Object.values(FIXED_STAGES).forEach(stage => {
+                editor.appendChild(createFunnelStageEditorItem(stage));
+            });
+        }
+        
+        function createFunnelStageEditorItem(stage) {
+            const item = document.createElement('div');
+            item.className = 'funnel-editor-item';
+            item.dataset.id = stage.id;
+            
+            if (stage.isFixed) {
+                item.dataset.fixed = "true";
+                item.innerHTML = `<input type="text" class="form-control stage-name" value="${stage.name}" disabled>
+                <input type="number" class="form-control stage-probability" value="${stage.probability}" disabled>%`;
+            } else {
+                 item.innerHTML = `
+                    <input type="text" class="form-control stage-name" value="${stage.name}" placeholder="Nome da Etapa">
+                    <input type="number" class="form-control stage-probability" value="${stage.probability}" placeholder="%">
+                    <div class="actions">
+                        <button type="button" class="funnel-editor-btn move-up" title="Mover para Cima"><i class="fas fa-arrow-up"></i></button>
+                        <button type="button" class="funnel-editor-btn move-down" title="Mover para Baixo"><i class="fas fa-arrow-down"></i></button>
+                        <button type="button" class="funnel-editor-btn delete-stage" title="Excluir Etapa"><i class="fas fa-trash"></i></button>
+                    </div>`;
+            }
+            return item;
+        }
+
+        function addFunnelStageEditor() {
+            const editor = document.getElementById('funnelEditor');
+            const newStage = {
+                id: 'new_' + Date.now(),
+                name: '',
+                probability: 0
+            };
+            const newItem = createFunnelStageEditorItem(newStage);
+            const fixedStagesContainer = Array.from(editor.children).find(child => child.dataset.fixed === "true");
+            editor.insertBefore(newItem, fixedStagesContainer);
+        }
+
+        // =========================================================
+        // CORREÇÃO E MELHORIA - Função de salvar configurações
+        // =========================================================
         function saveCorretorData(e) {
             e.preventDefault();
             
-            corretorData.nome = document.getElementById('corretorNome').value;
-            corretorData.creci = document.getElementById('corretorCreciInput').value;
-            corretorData.telefone = document.getElementById('corretorTelefone').value;
-            corretorData.metaLeads = parseInt(document.getElementById('metaLeads').value) || 20;
-            corretorData.defaultComissao = parseFloat(document.getElementById('defaultComissao').value) || 5;
+            const updatedData = { ...corretorData };
+
+            updatedData.nome = document.getElementById('corretorNome').value;
+            updatedData.creci = document.getElementById('corretorCreciInput').value;
+            updatedData.telefone = document.getElementById('corretorTelefone').value;
+            updatedData.metaLeads = parseInt(document.getElementById('metaLeads').value) || 20;
+            updatedData.defaultComissao = parseFloat(document.getElementById('defaultComissao').value) || 5;
+
+            const newFunnelConfig = [];
+            document.querySelectorAll('.funnel-editor-item:not([data-fixed="true"])').forEach(item => {
+                 const name = item.querySelector('.stage-name').value.trim();
+                 if(name){
+                    newFunnelConfig.push({
+                        id: item.dataset.id.startsWith('new_') ? name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now() : item.dataset.id,
+                        name: name,
+                        probability: parseInt(item.querySelector('.stage-probability').value) || 0
+                    });
+                 }
+            });
+
+            if(newFunnelConfig.length === 0){
+                 showAlert('warning', 'O funil de vendas deve ter pelo menos uma etapa.');
+                 return;
+            }
+            updatedData.funnelConfig = newFunnelConfig;
             
             const logoFile = document.getElementById('corretorLogoInput').files[0];
-            const save = () => {
-                localStorage.setItem('corretorData', JSON.stringify(corretorData));
+            const bannerFile = document.getElementById('corretorBannerInput').files[0];
+
+            // Função auxiliar que converte um arquivo para base64 e retorna uma Promise
+            const readFileAsBase64 = (file) => {
+                return new Promise((resolve, reject) => {
+                    if (!file) {
+                        resolve(null);
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            // Cria um array de promises para os arquivos
+            const filePromises = [
+                readFileAsBase64(logoFile),
+                readFileAsBase64(bannerFile)
+            ];
+
+            // Promise.all espera que todas as promises (leituras de arquivo) terminem
+            Promise.all(filePromises).then(([logoResult, bannerResult]) => {
+                // Atualiza os dados somente se um novo arquivo foi enviado
+                if (logoResult) updatedData.logo = logoResult;
+                if (bannerResult) updatedData.banner = bannerResult;
+                
+                // Agora, com tudo processado, salvamos os dados
+                corretorData = updatedData;
+                saveToLocalStorage();
+                populateFunnelElements();
                 updateAllDashboards();
                 closeModal(settingsModal);
                 showAlert('success', 'Configurações salvas com sucesso!');
-            };
 
-            if (logoFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    corretorData.logo = e.target.result;
-                    save();
-                };
-                reader.readAsDataURL(logoFile);
-            } else {
-                save();
-            }
+            }).catch(error => {
+                console.error("Erro ao ler arquivos: ", error);
+                showAlert('danger', 'Ocorreu um erro ao processar as imagens. Tente novamente.');
+            });
         }
         
-        // NOVA FUNÇÃO
+        // Funções de Gerenciamento de Dados (sem alterações)
         function removeDuplicates() {
-            if (!confirm('Tem certeza que deseja remover clientes duplicados? Esta ação verificará por telefone e e-mail, mantendo o primeiro registro encontrado de cada cliente. Esta ação não pode ser desfeita.')) {
+            if (!confirm('Tem certeza que deseja remover clientes duplicados? Esta ação verificará por telefone e e-mail, mantendo o primeiro registro encontrado. Esta ação não pode ser desfeita.')) {
                 return;
             }
 
@@ -1111,21 +1884,13 @@
                 const normalizedEmail = client.email ? client.email.trim().toLowerCase() : '';
 
                 let isDuplicate = false;
-                if (normalizedPhone && seenPhones.has(normalizedPhone)) {
-                    isDuplicate = true;
-                }
-                if (normalizedEmail && seenEmails.has(normalizedEmail)) {
-                    isDuplicate = true;
-                }
+                if (normalizedPhone && seenPhones.has(normalizedPhone)) isDuplicate = true;
+                if (!isDuplicate && normalizedEmail && seenEmails.has(normalizedEmail)) isDuplicate = true;
 
                 if (!isDuplicate) {
                     uniqueClients.push(client);
-                    if (normalizedPhone) {
-                        seenPhones.add(normalizedPhone);
-                    }
-                    if (normalizedEmail) {
-                        seenEmails.add(normalizedEmail);
-                    }
+                    if (normalizedPhone) seenPhones.add(normalizedPhone);
+                    if (normalizedEmail) seenEmails.add(normalizedEmail);
                 }
             });
 
@@ -1135,7 +1900,7 @@
                 saveToLocalStorage();
                 updateAllDashboards();
                 closeModal(settingsModal);
-                showAlert('success', `${removedCount} cliente(s) duplicado(s) foram removidos com sucesso!`);
+                showAlert('success', `${removedCount} cliente(s) duplicado(s) foram removidos!`);
             } else {
                 closeModal(settingsModal);
                 showAlert('info', 'Nenhum cliente duplicado foi encontrado.');
@@ -1143,7 +1908,7 @@
         }
 
         function clearSystem() {
-            if (confirm('ATENÇÃO: Esta ação irá apagar TODOS os dados do sistema, incluindo clientes e configurações. Tem certeza?')) {
+            if (confirm('ATENÇÃO: Esta ação irá apagar TODOS os dados do sistema (clientes, imóveis e configurações). Tem certeza?')) {
                 localStorage.clear();
                 window.location.reload();
             }
@@ -1151,17 +1916,18 @@
         
         function downloadExcelTemplate() {
             const templateHeaders = [
-                ["nome", "telefone", "email", "etapaFunil", "pretensao", "comissao", "tipoImovel", "observacoes", "proximoContato"]
+                ["nome", "telefone", "email", "dataNascimento", "renda", "etapaFunil", "pretensao", "comissao", "tipoImovel", "observacoes", "proximoContato"]
             ];
             const exampleData = [
-                ["João da Silva (Exemplo)", "(11) 98765-4321", "joao.silva@exemplo.com", "lead", "R$ 500.000,00", "5", "Apartamento", "Cliente buscando 3 quartos na Zona Sul", "2025-12-31"]
+                ["João da Silva (Exemplo)", "(11) 98765-4321", "joao.silva@exemplo.com", "1985-05-20", "R$ 4.000,00", "lead", "R$ 500.000,00", "5", "Apartamento", "Cliente buscando 3 quartos na Zona Sul", "2025-12-31"]
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(templateHeaders.concat(exampleData));
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Clientes");
-
-            const note = `Nota: A coluna 'etapaFunil' deve conter um dos seguintes valores (sem acentos): ${Object.keys(FUNNEL_STAGES).join(', ')}.`;
+            
+            const funnelIds = [...getFunnelStages().map(s => s.id), 'venda', 'perdido'];
+            const note = `Nota: A coluna 'etapaFunil' deve conter um dos seguintes valores (IDs): ${funnelIds.join(', ')}. A data de nascimento deve estar no formato AAAA-MM-DD.`;
             const noteSheet = XLSX.utils.aoa_to_sheet([["Instruções"], [note]]);
             XLSX.utils.book_append_sheet(wb, noteSheet, "Instruções");
 
@@ -1170,12 +1936,13 @@
         }
 
         function exportData() {
-            if (clients.length === 0) {
+            if (clients.length === 0 && properties.length === 0) {
                 showAlert('info', 'Não há dados para exportar.');
                 return;
             }
             const data = {
                 clients: clients,
+                properties: properties,
                 corretor: corretorData
             };
             
@@ -1202,10 +1969,13 @@
                     const data = JSON.parse(result);
                     if (data.clients && Array.isArray(data.clients)) {
                         clients = data.clients;
-                        if (data.corretor) corretorData = data.corretor;
+                        properties = data.properties || []; // Carrega imóveis, ou um array vazio se não existir
+                        if (data.corretor) {
+                            corretorData = data.corretor;
+                            if(!corretorData.funnelConfig) corretorData.funnelConfig = []; // Garante compatibilidade
+                        }
                         
-                        saveToLocalStorage();
-                        updateAllDashboards();
+                        initialize(); // Re-inicializa para aplicar configurações importadas
                         showAlert('success', 'Backup JSON importado com sucesso!');
                     } else {
                         showAlert('warning', 'Arquivo JSON inválido. Verifique o formato do backup.');
@@ -1225,34 +1995,32 @@
                     
                     let importedCount = 0;
                     let skippedCount = 0;
+                    const funnelIds = getAllFunnelStagesWithFixed().map(s => s.id);
 
                     importedClients.forEach(newClient => {
-                        // Validação mínima para a linha ser considerada
                         if (newClient.nome && newClient.telefone) {
                             const newPhone = String(newClient.telefone).replace(/\D/g, '');
                             const newEmail = newClient.email ? String(newClient.email).trim().toLowerCase() : null;
 
-                            // Verifica se já existe um cliente com o mesmo telefone ou e-mail
                             const isDuplicate = clients.some(existingClient => {
                                 const existingPhone = String(existingClient.telefone).replace(/\D/g, '');
                                 const existingEmail = existingClient.email ? String(existingClient.email).trim().toLowerCase() : null;
-
                                 if (existingPhone === newPhone) return true;
                                 if (newEmail && existingEmail && existingEmail === newEmail) return true;
-                                
                                 return false;
                             });
 
                             if (isDuplicate) {
                                 skippedCount++;
                             } else {
-                                // Se não for duplicado, adiciona o cliente
                                 const clientData = {
-                                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                                    id: generateUniqueId(),
                                     nome: newClient.nome || '',
                                     telefone: String(newClient.telefone) || '',
                                     email: newClient.email || '',
-                                    etapaFunil: newClient.etapaFunil && FUNNEL_STAGES[newClient.etapaFunil.toLowerCase()] ? newClient.etapaFunil.toLowerCase() : 'lead',
+                                    dataNascimento: newClient.dataNascimento || '',
+                                    renda: newClient.renda || '',
+                                    etapaFunil: newClient.etapaFunil && funnelIds.includes(newClient.etapaFunil.toLowerCase()) ? newClient.etapaFunil.toLowerCase() : (funnelIds[0] || 'lead'),
                                     pretensao: newClient.pretensao || '',
                                     comissao: newClient.comissao || '',
                                     tipoImovel: newClient.tipoImovel || '',
@@ -1267,9 +2035,9 @@
                     });
                     
                     if (importedCount > 0 || skippedCount > 0) {
-                        let successMessage = `${importedCount} cliente(s) novo(s) importado(s) com sucesso.`;
+                        let successMessage = `${importedCount} cliente(s) novo(s) importado(s).`;
                         if (skippedCount > 0) {
-                            successMessage += ` ${skippedCount} cliente(s) não foram adicionados por já existirem (telefone/e-mail duplicado).`;
+                            successMessage += ` ${skippedCount} cliente(s) não foram adicionados por já existirem.`;
                         }
                         showAlert('success', successMessage);
                         
@@ -1299,14 +2067,16 @@
             
             e.target.value = '';
         }
-
+        
+        // Funções de Impressão (sem alterações)
         function printReport(filter) {
             let filteredClients = clients;
             let title = "Relatório de Todos os Clientes";
+            const funnelNames = getFunnelNamesMap();
             
             if (filter && filter !== 'all') {
                 filteredClients = clients.filter(c => c.etapaFunil === filter);
-                title = `Relatório de Clientes - ${FUNNEL_STAGES[filter]}`;
+                title = `Relatório de Clientes - ${funnelNames[filter]}`;
             }
             
             const printWindow = window.open('', '_blank');
@@ -1316,21 +2086,26 @@
                     body { font-family: Arial, sans-serif; margin: 20px; }
                     h1 { color: #0A2F5B; text-align: center; } table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; } th { background-color: #f2f2f2; }
-                    .no-print { display: none; }
+                    @media print { .no-print { display: none; } }
                 </style></head><body>
                     <h1>${title}</h1>
                     <p><strong>Corretor:</strong> ${corretorData.nome} (CRECI: ${corretorData.creci})</p>
                     <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
                     <p><strong>Total de Clientes:</strong> ${filteredClients.length}</p>
-                    <table><thead><tr><th>Nome</th><th>Contato</th><th>Etapa</th><th>Valor Imóvel</th><th>Próx. Contato</th></tr></thead>
-                    <tbody>${filteredClients.map(c => `
+                    <table><thead><tr><th>Nome</th><th>Contato</th><th>Idade</th><th>Renda</th><th>Etapa</th><th>Imóvel Interesse</th></tr></thead>
+                    <tbody>${filteredClients.map(c => {
+                        const property = properties.find(p => p.id === c.propertyId);
+                        const propertyName = property ? property.nome : (c.tipoImovel || 'N/A');
+                        const age = calculateAge(c.dataNascimento) ? `${calculateAge(c.dataNascimento)} anos` : 'N/A';
+                        return `
                         <tr>
                             <td>${c.nome}</td>
                             <td>${c.telefone}${c.email ? `<br>${c.email}` : ''}</td>
-                            <td>${FUNNEL_STAGES[c.etapaFunil]}</td>
-                            <td>${c.pretensao || 'N/A'}</td>
-                            <td>${c.proximoContato ? new Date(c.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A'}</td>
-                        </tr>`).join('')}
+                            <td>${age}</td>
+                            <td>${c.renda || 'N/A'}</td>
+                            <td>${funnelNames[c.etapaFunil]}</td>
+                            <td>${propertyName}</td>
+                        </tr>`}).join('')}
                     </tbody></table></body></html>`);
             printWindow.document.close();
             printWindow.print();
@@ -1346,7 +2121,7 @@
                     .summary { display: flex; justify-content: space-around; text-align: center; margin: 30px 0; }
                     .metric { padding: 20px; border: 1px solid #ddd; border-radius: 5px; width: 30%; }
                     .metric h3 { margin-top: 0; } .metric p { font-size: 22px; font-weight: bold; }
-                    .no-print { display: none; }
+                    @media print { .no-print { display: none; } }
                 </style></head><body>
                     <h1>Relatório Financeiro</h1>
                     <p><strong>Corretor:</strong> ${corretorData.nome} (CRECI: ${corretorData.creci})</p>
@@ -1361,6 +2136,7 @@
             printWindow.print();
         }
 
+        // Funções de Modal e Alerta (sem alterações)
         function showAlert(type, message) {
             const alertContainer = document.querySelector('.container');
             const alert = document.getElementById(`${type}Alert`);
@@ -1372,7 +2148,7 @@
             
             setTimeout(() => {
                 alert.classList.add('hidden');
-            }, 8000); // Aumentado o tempo para mensagens mais longas
+            }, 8000);
         }
 
         function openModal(modal) {
@@ -1385,7 +2161,187 @@
 
         function saveToLocalStorage() {
             localStorage.setItem('prospectClients', JSON.stringify(clients));
+            localStorage.setItem('prospectProperties', JSON.stringify(properties));
             localStorage.setItem('corretorData', JSON.stringify(corretorData));
+        }
+
+        // *** FUNÇÕES DE ANÁLISE (sem alterações) ***
+        function updateEstimatedMinIncome() {
+            const valorTabelaInput = document.getElementById('imovelValorTabela');
+            const rendaMinimaElement = document.getElementById('rendaMinimaEstimada');
+            const propertyValue = parseCurrency(valorTabelaInput.value);
+
+            if (propertyValue > 0) {
+                const minIncome = propertyValue / FINANCING_FACTOR;
+                rendaMinimaElement.textContent = formatToBRL(minIncome);
+            } else {
+                rendaMinimaElement.textContent = 'R$ 0,00';
+            }
+        }
+        
+        function toggleFinanceAnalysisSection() {
+            const propertyId = document.getElementById('imovelInteresse').value;
+            const analysisSection = document.getElementById('financeAnalysisSection');
+            const analysisResult = document.getElementById('resultadoAnalise');
+
+            if(propertyId) {
+                analysisSection.classList.remove('hidden');
+            } else {
+                analysisSection.classList.add('hidden');
+            }
+            analysisResult.classList.add('hidden'); // Sempre oculta o resultado ao trocar de imóvel
+        }
+
+        function analyzeFinancingCompatibility() {
+            const clientIncome = parseCurrency(document.getElementById('renda').value);
+            const birthDate = document.getElementById('dataNascimento').value;
+            const propertyId = document.getElementById('imovelInteresse').value;
+            const analysisResult = document.getElementById('resultadoAnalise');
+
+            if (!birthDate) {
+                 analysisResult.innerHTML = '<strong>Atenção:</strong> É necessário informar a <strong>Data de Nascimento</strong> do cliente para a análise.';
+                 analysisResult.className = 'alert alert-warning';
+                 analysisResult.classList.remove('hidden');
+                 return;
+            }
+            
+            if (!clientIncome || clientIncome <= 0) {
+                analysisResult.innerHTML = '<strong>Atenção:</strong> Por favor, informe a <strong>Renda Mensal</strong> do cliente.';
+                analysisResult.className = 'alert alert-warning';
+                analysisResult.classList.remove('hidden');
+                return;
+            }
+
+            const property = properties.find(p => p.id === propertyId);
+            if (!property || !property.valorTabela) {
+                 analysisResult.innerHTML = '<strong>Atenção:</strong> O imóvel selecionado não possui um valor de tabela para análise.';
+                 analysisResult.className = 'alert alert-warning';
+                 analysisResult.classList.remove('hidden');
+                 return;
+            }
+            
+            const clientAge = calculateAge(birthDate);
+            const remainingYears = MAX_FINANCING_AGE - clientAge;
+            const maxTermForClient = Math.min(MAX_FINANCING_TERM_YEARS, remainingYears);
+
+            if (maxTermForClient <= 0) {
+                 analysisResult.innerHTML = `<strong>Perfil Incompatível.</strong> Com ${clientAge} anos, o cliente excedeu a idade máxima para contratar um financiamento.`;
+                 analysisResult.className = 'alert alert-danger';
+                 analysisResult.classList.remove('hidden');
+                 return;
+            }
+
+            const propertyValue = parseCurrency(property.valorTabela);
+            const maxFinancingBasedOnIncome = clientIncome * FINANCING_FACTOR;
+
+            let resultMessage = '';
+            if (maxFinancingBasedOnIncome >= propertyValue) {
+                resultMessage = `<strong>Parabéns!</strong> O perfil do cliente é compatível.<br>
+                                 Poder de financiamento estimado: <strong>${formatToBRL(maxFinancingBasedOnIncome)}</strong>.<br>
+                                 O cliente tem ${clientAge} anos, permitindo um prazo de até <strong>${Math.floor(maxTermForClient)} anos</strong>.`;
+                analysisResult.className = 'alert alert-success';
+            } else {
+                const downPaymentNeeded = propertyValue - maxFinancingBasedOnIncome;
+                resultMessage = `<strong>Perfil Incompatível.</strong> O poder de financiamento é insuficiente.<br>
+                                 Poder de financiamento estimado: <strong>${formatToBRL(maxFinancingBasedOnIncome)}</strong>.<br>
+                                 Para este imóvel, o cliente precisaria de uma entrada de aproximadamente: <strong>${formatToBRL(downPaymentNeeded)}</strong>.<br>
+                                 O cliente tem ${clientAge} anos, permitindo um prazo de até <strong>${Math.floor(maxTermForClient)} anos</strong>.`;
+                analysisResult.className = 'alert alert-warning';
+            }
+            analysisResult.innerHTML = resultMessage;
+            analysisResult.classList.remove('hidden');
+        }
+
+        // ===============================================
+        // NOVO: Funções para Lightbox e Download de PDF
+        // ===============================================
+
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            photoLightbox.style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            photoLightbox.style.display = 'none';
+        }
+
+        async function downloadClientFicha(e) {
+            const clientId = e.target.dataset.clientId;
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            const element = document.getElementById('clientViewContent');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            showAlert('info', 'Gerando PDF da ficha do cliente, por favor aguarde...');
+
+            const canvas = await html2canvas(element);
+            const imgData = canvas.toDataURL('image/png');
+            
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            
+            doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            doc.save(`ficha-cliente-${client.nome.replace(/\s/g, '_')}.pdf`);
+        }
+
+        async function downloadPropertyFicha(e) {
+            const propertyId = e.target.dataset.propertyId;
+            const property = properties.find(p => p.id === propertyId);
+            if (!property) return;
+
+            const element = document.getElementById('propertyViewContent');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            showAlert('info', 'Gerando PDF com fotos, isso pode levar alguns segundos...');
+
+            const canvas = await html2canvas(element);
+            const imgData = canvas.toDataURL('image/png');
+            
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            doc.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, imgHeight);
+
+            if (property.fotos && property.fotos.length > 0) {
+                doc.addPage();
+                doc.setFontSize(16);
+                doc.text('Fotos do Imóvel', 10, 15);
+                
+                let y = 25;
+                const margin = 10;
+                const photoWidth = (pdfWidth - (margin * 3)) / 2; // Duas fotos por linha
+
+                for (let i = 0; i < property.fotos.length; i++) {
+                    const foto = property.fotos[i];
+                    
+                    // Lógica para posicionar as fotos em duas colunas
+                    const x = (i % 2 === 0) ? margin : margin * 2 + photoWidth;
+                    
+                    // Adiciona nova página se não houver espaço
+                    if (y + photoWidth > doc.internal.pageSize.getHeight() - margin) {
+                        doc.addPage();
+                        doc.setFontSize(16);
+                        doc.text('Fotos do Imóvel (continuação)', 10, 15);
+                        y = 25;
+                    }
+
+                    try {
+                        doc.addImage(foto, 'JPEG', x, y, photoWidth, photoWidth);
+                    } catch (error) {
+                         console.error("Erro ao adicionar imagem ao PDF: ", error);
+                         doc.text('Erro ao carregar esta imagem.', x, y);
+                    }
+                    
+                    if (i % 2 !== 0) {
+                        y += photoWidth + margin;
+                    }
+                }
+            }
+
+            doc.save(`ficha-imovel-${property.nome.replace(/\s/g, '_')}.pdf`);
         }
 
         initialize();
