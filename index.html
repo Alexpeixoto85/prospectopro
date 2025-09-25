@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -185,6 +186,7 @@
         .action-btn.action-whatsapp:hover i { color: var(--success); }
         .action-btn.action-edit:hover i { color: var(--warning-dark); }
         .action-btn.action-delete:hover i { color: var(--danger); }
+        .action-btn.action-complete:hover i { color: var(--success); }
         
         .today-contact {
             background-color: #FFF3CD !important; /* Amarelo claro do Bootstrap */
@@ -267,7 +269,7 @@
         .logo-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); margin-top: 10px; }
         .banner-preview { width: 100%; max-height: 150px; object-fit: cover; border: 2px solid var(--border-color); margin-top: 10px; border-radius: 6px; }
 
-        .finance-page, .clients-page, .properties-page, .bi-page { display: none; }
+        .finance-page, .clients-page, .properties-page, .bi-page, .agenda-page { display: none; }
 
         .charts-container {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -397,6 +399,50 @@
         .market-indicator-card .indicator-details a:hover {
             text-decoration: underline;
         }
+        
+        /* --- ESTILOS DA AGENDA --- */
+        .agenda-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background-color: var(--background-light);
+            transition: box-shadow 0.3s;
+        }
+        .agenda-item:hover { box-shadow: 0 2px 8px var(--shadow-color); }
+        .agenda-item.completed .agenda-details h4,
+        .agenda-item.completed .agenda-details p {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        .agenda-item.overdue { border-left: 4px solid var(--danger); }
+        .agenda-date {
+            text-align: center;
+            margin-right: 20px;
+            padding-right: 20px;
+            border-right: 1px solid var(--border-color);
+        }
+        .agenda-date .day { font-size: 24px; font-weight: 700; color: var(--primary); display: block; }
+        .agenda-date .month { font-size: 14px; text-transform: uppercase; color: var(--text-light); display: block; }
+        .agenda-date .time { font-size: 14px; font-weight: 600; display: block; margin-top: 4px; }
+        .agenda-details { flex-grow: 1; }
+        .agenda-details h4 { font-size: 18px; margin-bottom: 5px; }
+        .agenda-details p { margin: 0; color: var(--text-light); }
+        .agenda-details .client-link { font-weight: 600; color: var(--secondary); }
+        .agenda-actions { display: flex; gap: 5px; }
+        /* --- FIM ESTILOS DA AGENDA --- */
+        
+        .dashboard-agenda-list { list-style: none; padding: 0; }
+        .dashboard-agenda-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+         .dashboard-agenda-item:last-child { border-bottom: none; }
+         .dashboard-agenda-item .time { font-weight: 600; color: var(--primary); margin-right: 10px; }
+         .dashboard-agenda-item .title { font-weight: 500; }
+         .dashboard-agenda-item .client { color: var(--text-light); font-size: 14px; }
 
         @media (max-width: 992px) {
             header .actions .btn { min-width: 150px; }
@@ -432,6 +478,7 @@
                         <div class="dropdown-content">
                             <button class="show-clients-page"><i class="fas fa-users"></i> Clientes</button>
                             <button class="show-properties-page"><i class="fas fa-building"></i> Imóveis</button>
+                            <button class="show-agenda-page"><i class="fas fa-calendar-alt"></i> Agenda</button>
                             <button class="show-finance-page"><i class="fas fa-chart-line"></i> Financeiro</button>
                             <button class="show-bi-page"><i class="fas fa-brain"></i> Inteligência de Negócios</button>
                         </div>
@@ -485,6 +532,12 @@
                 </small>
 
                 <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+                <div id="dashboardAgendaSection">
+                    <h3 class="goal-title" style="margin-bottom: 20px; text-align: center; font-size: 1.2em;">Compromissos para Hoje</h3>
+                    <div id="dashboardAgendaList" class="dashboard-agenda-list"></div>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
                 <h3 class="goal-title" style="margin-bottom: 20px; text-align: center; font-size: 1.2em;">Resumo do Funil de Vendas</h3>
                 <div id="salesFunnel" class="sales-funnel"></div>
                 
@@ -516,6 +569,7 @@
                         <button class="btn btn-primary"><i class="fas fa-th-large"></i> Painéis</button>
                         <div class="dropdown-content">
                             <button class="show-properties-page"><i class="fas fa-building"></i> Imóveis</button>
+                            <button class="show-agenda-page"><i class="fas fa-calendar-alt"></i> Agenda</button>
                             <button class="show-finance-page"><i class="fas fa-chart-line"></i> Financeiro</button>
                             <button class="show-bi-page"><i class="fas fa-brain"></i> Inteligência de Negócios</button>
                         </div>
@@ -588,6 +642,7 @@
                         <button class="btn btn-primary"><i class="fas fa-th-large"></i> Painéis</button>
                         <div class="dropdown-content">
                             <button class="show-clients-page"><i class="fas fa-users"></i> Clientes</button>
+                            <button class="show-agenda-page"><i class="fas fa-calendar-alt"></i> Agenda</button>
                             <button class="show-finance-page"><i class="fas fa-chart-line"></i> Financeiro</button>
                             <button class="show-bi-page"><i class="fas fa-brain"></i> Inteligência de Negócios</button>
                         </div>
@@ -623,6 +678,48 @@
             </div>
         </div>
     </div>
+    
+    <div id="agendaPage" class="agenda-page">
+        <header>
+            <div class="container header-content">
+                 <div class="corretor-info">
+                    <img id="corretorLogoAgenda" src="" class="corretor-logo" alt="Logo do Corretor">
+                    <div class="corretor-details">
+                        <div id="corretorNameAgenda" class="corretor-name">Nome do Corretor</div>
+                        <div id="corretorCreciAgenda" class="corretor-creci">CRECI: 000000</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary show-main-page"><i class="fas fa-arrow-left"></i> Voltar ao Início</button>
+                    <button id="newEventBtn" class="btn btn-success"><i class="fas fa-plus"></i> Novo Compromisso</button>
+                     <div class="dropdown">
+                        <button class="btn btn-primary"><i class="fas fa-th-large"></i> Painéis</button>
+                        <div class="dropdown-content">
+                           <button class="show-clients-page"><i class="fas fa-users"></i> Clientes</button>
+                           <button class="show-properties-page"><i class="fas fa-building"></i> Imóveis</button>
+                           <button class="show-finance-page"><i class="fas fa-chart-line"></i> Financeiro</button>
+                           <button class="show-bi-page"><i class="fas fa-brain"></i> Inteligência de Negócios</button>
+                        </div>
+                    </div>
+                    <a href="https://alexpeixoto85.github.io/planoprofinal/" target="_blank" class="btn btn-secondary btn-icon-only" title="Plano de Pagamento"><i class="fas fa-calculator"></i></a>
+                    <button class="btn btn-warning show-settings"><i class="fas fa-cog"></i> Configurações</button>
+                </div>
+            </div>
+        </header>
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-calendar-alt"></i> Agenda de Compromissos</h2>
+                    <div id="agendaFilter" class="actions funnel-filter">
+                        <button class="funnel-filter-btn active" data-filter="today">Hoje</button>
+                        <button class="funnel-filter-btn" data-filter="week">Esta Semana</button>
+                        <button class="funnel-filter-btn" data-filter="all">Todos</button>
+                    </div>
+                </div>
+                <div id="agendaList"></div>
+            </div>
+        </div>
+    </div>
 
 
     <div id="financePage" class="finance-page">
@@ -643,6 +740,7 @@
                         <div class="dropdown-content">
                            <button class="show-clients-page"><i class="fas fa-users"></i> Clientes</button>
                            <button class="show-properties-page"><i class="fas fa-building"></i> Imóveis</button>
+                           <button class="show-agenda-page"><i class="fas fa-calendar-alt"></i> Agenda</button>
                            <button class="show-bi-page"><i class="fas fa-brain"></i> Inteligência de Negócios</button>
                         </div>
                     </div>
@@ -725,6 +823,7 @@
                         <div class="dropdown-content">
                            <button class="show-clients-page"><i class="fas fa-users"></i> Clientes</button>
                            <button class="show-properties-page"><i class="fas fa-building"></i> Imóveis</button>
+                           <button class="show-agenda-page"><i class="fas fa-calendar-alt"></i> Agenda</button>
                            <button class="show-finance-page"><i class="fas fa-chart-line"></i> Financeiro</button>
                         </div>
                     </div>
@@ -872,7 +971,7 @@
                     <div class="form-group"><label for="observacoes" class="form-label">Observações</label><textarea id="observacoes" rows="4" class="form-control"></textarea></div>
                     <div class="form-row">
                         <div class="form-col"><div class="form-group"><label for="dataContato" class="form-label">Último Contato</label><input type="date" id="dataContato" class="form-control"></div></div>
-                        <div class="form-col"><div class="form-group"><label for="proximoContato" class="form-label">Próximo Contato</label><input type="date" id="proximoContato" class="form-control"></div></div>
+                        <div class="form-col"><div class="form-group"><label for="proximoContato" class="form-label">Próximo Contato (Legado)</label><input type="date" id="proximoContato" class="form-control"></div></div>
                     </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
@@ -916,11 +1015,39 @@
         </div>
     </div>
     
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="modal-title" id="eventFormTitle">Novo Compromisso</h2><button class="modal-close">&times;</button></div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <div class="form-group"><label for="eventTitle" class="form-label">Título*</label><input type="text" id="eventTitle" class="form-control" required></div>
+                    <div class="form-row">
+                        <div class="form-col"><div class="form-group"><label for="eventDate" class="form-label">Data*</label><input type="date" id="eventDate" class="form-control" required></div></div>
+                        <div class="form-col"><div class="form-group"><label for="eventTime" class="form-label">Hora</label><input type="time" id="eventTime" class="form-control"></div></div>
+                    </div>
+                    <div class="form-group"><label for="eventClientId" class="form-label">Associar ao Cliente</label><select id="eventClientId" class="form-control"></select></div>
+                    <div class="form-group"><label for="eventDescription" class="form-label">Descrição/Notas</label><textarea id="eventDescription" rows="4" class="form-control"></textarea></div>
+                     <div class="form-group" id="eventStatusGroup" style="display: none;">
+                        <label class="form-label"><input type="checkbox" id="eventStatus" style="margin-right: 8px;">Marcar como concluído</label>
+                    </div>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Compromisso</button>
+                        <button type="button" class="btn btn-danger modal-close"><i class="fas fa-times"></i> Cancelar</button>
+                    </div>
+                    <input type="hidden" id="editEventId">
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <div id="clientViewModal" class="modal">
         <div class="modal-content">
             <div class="modal-header"><h2 class="modal-title">Ficha do Cliente</h2><button class="modal-close">&times;</button></div>
             <div class="modal-body">
                 <div id="clientViewContent" class="view-info-grid"></div>
+                <hr style="margin: 25px 0;">
+                <h3 class="card-title" style="margin-bottom: 15px;"><i class="fas fa-calendar-alt"></i> Compromissos do Cliente</h3>
+                <div id="clientViewAgenda" class="dashboard-agenda-list"></div>
                 <div class="form-group" style="margin-top: 20px;">
                     <button id="downloadClientFichaBtn" class="btn btn-success"><i class="fas fa-file-pdf"></i> Baixar Ficha em PDF</button>
                 </div>
@@ -1096,7 +1223,10 @@
 
         let clients = JSON.parse(localStorage.getItem('prospectClients')) || [];
         let properties = JSON.parse(localStorage.getItem('prospectProperties')) || [];
+        let agenda = JSON.parse(localStorage.getItem('prospectAgenda')) || [];
         let currentFilter = 'all';
+        let currentAgendaFilter = 'today';
+        
         let corretorData = JSON.parse(localStorage.getItem('corretorData')) || {
             nome: 'Seu Nome', creci: '000000', telefone: '', logo: '', banner: '', metaLeads: 20, defaultComissao: 5, funnelConfig: [], revenueGoal: 20000, teamRevenueGoal: 100000,
             conversionRates: {
@@ -1110,6 +1240,7 @@
         const clientModal = document.getElementById('clientModal');
         const propertyModal = document.getElementById('propertyModal');
         const settingsModal = document.getElementById('settingsModal');
+        const eventModal = document.getElementById('eventModal');
         const clientViewModal = document.getElementById('clientViewModal');
         const propertyViewModal = document.getElementById('propertyViewModal');
         const massMessageModal = document.getElementById('massMessageModal');
@@ -1125,6 +1256,7 @@
         const clientsPage = document.getElementById('clientsPage');
         const propertiesPage = document.getElementById('propertiesPage');
         const biPage = document.getElementById('biPage');
+        const agendaPage = document.getElementById('agendaPage');
 
         // Chart instances
         let mainFunnelChart, funnelChart, revenueChart, monthlyChart, propertyTypeChart, leadQualityGauge, revenueGoalChart;
@@ -1170,7 +1302,7 @@
             populateFunnelElements();
             addEventListeners();
             updateAllDashboards();
-            checkTodayContacts();
+            checkTodaysAgenda();
         }
 
         function updateAllDashboards() {
@@ -1180,6 +1312,8 @@
             updateFinancialPanel();
             displayClients();
             displayProperties();
+            displayAgenda();
+            updateDashboardAgenda();
             updateMainDashboardFunnelChart();
             updateBIPanel();
         }
@@ -1216,6 +1350,7 @@
         function addEventListeners() {
             document.getElementById('newClientBtn').addEventListener('click', () => showClientForm());
             document.getElementById('newPropertyBtn').addEventListener('click', () => showPropertyForm());
+            document.getElementById('newEventBtn').addEventListener('click', () => showEventForm());
             document.getElementById('fileInput').addEventListener('change', importData);
             document.getElementById('printFinanceBtn').addEventListener('click', printFinanceReport);
             document.getElementById('reportAllClientsBtn').addEventListener('click', () => printReport('all'));
@@ -1228,6 +1363,7 @@
             });
             document.getElementById('clientForm').addEventListener('submit', saveClient);
             document.getElementById('propertyForm').addEventListener('submit', saveProperty);
+            document.getElementById('eventForm').addEventListener('submit', saveEvent);
             document.getElementById('corretorForm').addEventListener('submit', saveCorretorData);
             document.getElementById('cancelClientForm').addEventListener('click', () => closeModal(clientModal));
             document.getElementById('cancelPropertyForm').addEventListener('click', () => closeModal(propertyModal));
@@ -1249,6 +1385,7 @@
             document.querySelectorAll('.show-clients-page').forEach(btn => btn.addEventListener('click', showClientsPage));
             document.querySelectorAll('.show-properties-page').forEach(btn => btn.addEventListener('click', showPropertiesPage));
             document.querySelectorAll('.show-bi-page').forEach(btn => btn.addEventListener('click', showBIPage));
+            document.querySelectorAll('.show-agenda-page').forEach(btn => btn.addEventListener('click', showAgendaPage));
             document.querySelectorAll('.export-data').forEach(btn => btn.addEventListener('click', exportData));
             document.querySelectorAll('.import-data-trigger').forEach(btn => btn.addEventListener('click', () => document.getElementById('fileInput').click()));
             document.querySelectorAll('.download-template').forEach(btn => btn.addEventListener('click', downloadExcelTemplate));
@@ -1270,10 +1407,17 @@
             document.addEventListener('click', (e) => {
                 const filterButton = e.target.closest('.funnel-filter-btn');
                 if (filterButton) {
-                    currentFilter = filterButton.dataset.filter;
-                    document.querySelectorAll('.funnel-filter-btn').forEach(btn => btn.classList.remove('active'));
-                    filterButton.classList.add('active');
-                    displayClients();
+                    if (e.target.closest('#agendaFilter')) {
+                        currentAgendaFilter = filterButton.dataset.filter;
+                        document.querySelectorAll('#agendaFilter .funnel-filter-btn').forEach(btn => btn.classList.remove('active'));
+                        filterButton.classList.add('active');
+                        displayAgenda();
+                    } else if (e.target.closest('#funnelFilter')) {
+                        currentFilter = filterButton.dataset.filter;
+                        document.querySelectorAll('#funnelFilter .funnel-filter-btn').forEach(btn => btn.classList.remove('active'));
+                        filterButton.classList.add('active');
+                        displayClients();
+                    }
                 }
 
                 const clientCheckbox = e.target.closest('.client-checkbox');
@@ -1298,6 +1442,15 @@
                     if (action === 'edit') editProperty(id);
                     if (action === 'delete') deleteProperty(id);
                     if (action === 'view') showPropertyView(id);
+                }
+                
+                const agendaActionBtn = e.target.closest('#agendaList .action-btn');
+                 if (agendaActionBtn) {
+                    const action = agendaActionBtn.dataset.action;
+                    const id = agendaActionBtn.dataset.id;
+                    if (action === 'edit') editEvent(id);
+                    if (action === 'delete') deleteEvent(id);
+                    if (action === 'complete') toggleEventComplete(id);
                 }
 
                 const funnelEditor = e.target.closest('.funnel-editor-btn');
@@ -1386,49 +1539,29 @@
             document.getElementById('revenueGoal').addEventListener('input', formatCurrencyInput);
             document.getElementById('teamRevenueGoal').addEventListener('input', formatCurrencyInput);
         }
-
-        function showMainPage() {
-            mainPage.style.display = 'block';
-            financePage.style.display = 'none';
-            clientsPage.style.display = 'none';
-            propertiesPage.style.display = 'none';
-            biPage.style.display = 'none';
+        
+        function setPageVisibility(visiblePage) {
+            const pages = [mainPage, financePage, clientsPage, propertiesPage, biPage, agendaPage];
+            pages.forEach(page => {
+                page.style.display = page === visiblePage ? 'block' : 'none';
+            });
         }
 
+        function showMainPage() { setPageVisibility(mainPage); }
+        function showClientsPage() { setPageVisibility(clientsPage); }
+        function showPropertiesPage() { setPageVisibility(propertiesPage); }
+        function showAgendaPage() {
+            setPageVisibility(agendaPage);
+            displayAgenda();
+        }
         function showFinancePage() {
-            mainPage.style.display = 'none';
-            financePage.style.display = 'block';
-            clientsPage.style.display = 'none';
-            propertiesPage.style.display = 'none';
-            biPage.style.display = 'none';
+            setPageVisibility(financePage);
             updateFinancialCharts();
         }
-
-        function showClientsPage() {
-            mainPage.style.display = 'none';
-            financePage.style.display = 'none';
-            clientsPage.style.display = 'block';
-            propertiesPage.style.display = 'none';
-            biPage.style.display = 'none';
-        }
-
-        function showPropertiesPage() {
-            mainPage.style.display = 'none';
-            financePage.style.display = 'none';
-            clientsPage.style.display = 'none';
-            propertiesPage.style.display = 'block';
-            biPage.style.display = 'none';
-        }
-        
         function showBIPage() {
-            mainPage.style.display = 'none';
-            financePage.style.display = 'none';
-            clientsPage.style.display = 'none';
-            propertiesPage.style.display = 'none';
-            biPage.style.display = 'block';
-            updateBIPanel(); // Garante que os gráficos e dados estão atualizados
+            setPageVisibility(biPage);
+            updateBIPanel(); 
         }
-
 
         function updateCorretorInfo() {
             const commonName = corretorData.nome;
@@ -1813,12 +1946,15 @@
             
             filteredClients.forEach(client => {
                 const lastContact = client.dataContato ? new Date(client.dataContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Nunca';
-                const nextContact = client.proximoContato ? new Date(client.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não agendado';
+                
+                const nextClientContact = agenda.filter(e => e.clientId === client.id && new Date(e.start) >= new Date()).sort((a,b) => new Date(a.start) - new Date(b.start))[0];
+                const nextContact = nextClientContact ? new Date(nextClientContact.start).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não agendado';
+                
                 const birthday = client.dataNascimento ? new Date(client.dataNascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não informado';
                 const age = calculateAge(client.dataNascimento);
                 const birthdayText = age ? `${birthday} (${age} anos)` : birthday;
 
-                const isTodayContact = client.proximoContato === new Date().toISOString().split('T')[0];
+                const isTodayContact = nextClientContact && new Date(nextClientContact.start).toISOString().split('T')[0] === new Date().toISOString().split('T')[0];
                 const badgeClass = FIXED_STAGES[client.etapaFunil] ? `badge-${client.etapaFunil}` : 'badge-dynamic';
 
                 clientsList.innerHTML += `
@@ -1882,7 +2018,7 @@
                 `;
             });
         }
-
+        
         function showClientForm(client = null) {
             document.getElementById('clientForm').reset();
             populatePropertiesDropdown();
@@ -1976,11 +2112,12 @@
         }
 
         function deleteClient(id) {
-            if (confirm('Tem certeza que deseja excluir este cliente?')) {
+            if (confirm('Tem certeza que deseja excluir este cliente? Todos os compromissos associados a ele também serão removidos.')) {
                 clients = clients.filter(c => c.id !== id);
+                agenda = agenda.filter(e => e.clientId !== id);
                 saveToLocalStorage();
                 updateAllDashboards();
-                showAlert('success', 'Cliente excluído com sucesso!');
+                showAlert('success', 'Cliente e seus compromissos foram excluídos com sucesso!');
             }
         }
         
@@ -2077,6 +2214,25 @@
                 <div class="view-info-item"><strong>Próximo Contato</strong><span>${client.proximoContato ? new Date(client.proximoContato).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Não informado'}</span></div>
                 <div class="view-info-item view-info-full"><strong>Observações</strong><span>${client.observacoes || 'Nenhuma'}</span></div>
             `;
+            
+            // Display client's agenda
+            const clientAgendaList = document.getElementById('clientViewAgenda');
+            const clientEvents = agenda.filter(e => e.clientId === id).sort((a,b) => new Date(b.start) - new Date(a.start)); // Most recent first
+            if (clientEvents.length > 0) {
+                 clientAgendaList.innerHTML = clientEvents.map(event => {
+                    const eventDate = new Date(event.start);
+                    return `
+                     <li class="dashboard-agenda-item" style="${event.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">
+                         <span class="time">${eventDate.toLocaleDateString('pt-BR')} ${eventDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</span>
+                         <span class="title">${event.title}</span>
+                         <p class="client">${event.description || ''}</p>
+                     </li>
+                    `;
+                 }).join('');
+            } else {
+                 clientAgendaList.innerHTML = '<li>Nenhum compromisso encontrado para este cliente.</li>';
+            }
+            
             openModal(clientViewModal);
         }
 
@@ -2139,13 +2295,20 @@
             }
         }
 
-        function checkTodayContacts() {
-            const today = new Date().toISOString().split('T')[0];
-            const todayContacts = clients.filter(c => c.proximoContato === today);
+        function checkTodaysAgenda() {
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            const todayEnd = new Date();
+            todayEnd.setHours(23, 59, 59, 999);
+
+            const todayEvents = agenda.filter(e => {
+                const eventDate = new Date(e.start);
+                return eventDate >= todayStart && eventDate <= todayEnd && !e.completed;
+            });
             
-            if (todayContacts.length > 0) {
-                const names = todayContacts.map(c => c.nome).join(', ');
-                showAlert('warning', `Lembrete: Você tem ${todayContacts.length} contato(s) agendado(s) para hoje: ${names}`);
+            if (todayEvents.length > 0) {
+                const eventTitles = todayEvents.map(e => e.title).join(', ');
+                showAlert('warning', `Lembrete: Você tem ${todayEvents.length} compromisso(s) para hoje: ${eventTitles}`);
             }
         }
 
@@ -2155,8 +2318,8 @@
             document.getElementById('corretorTelefone').value = corretorData.telefone || '';
             document.getElementById('metaLeads').value = corretorData.metaLeads || 20;
             document.getElementById('defaultComissao').value = corretorData.defaultComissao || 5;
-            document.getElementById('revenueGoal').value = corretorData.revenueGoal ? formatToBRL(corretorData.revenueGoal).replace("R$ ", "") : '';
-            document.getElementById('teamRevenueGoal').value = corretorData.teamRevenueGoal ? formatToBRL(corretorData.teamRevenueGoal).replace("R$ ", "") : '';
+            document.getElementById('revenueGoal').value = corretorData.revenueGoal ? formatToBRL(corretorData.revenueGoal).replace("R$ ", "") : '';
+            document.getElementById('teamRevenueGoal').value = corretorData.teamRevenueGoal ? formatToBRL(corretorData.teamRevenueGoal).replace("R$ ", "") : '';
             
             const rates = corretorData.conversionRates;
             document.getElementById('convLeadToVisita').value = rates.leadToVisita || 20;
@@ -2370,13 +2533,14 @@
         }
 
         function exportData() {
-            if (clients.length === 0 && properties.length === 0) {
+            if (clients.length === 0 && properties.length === 0 && agenda.length === 0) {
                 showAlert('info', 'Não há dados para exportar.');
                 return;
             }
             const data = {
                 clients: clients,
                 properties: properties,
+                agenda: agenda,
                 corretor: corretorData
             };
             
@@ -2404,6 +2568,7 @@
                     if (data.clients && Array.isArray(data.clients)) {
                         clients = data.clients;
                         properties = data.properties || [];
+                        agenda = data.agenda || [];
                         if (data.corretor) {
                             corretorData = data.corretor;
                             if(!corretorData.funnelConfig) corretorData.funnelConfig = [];
@@ -2595,6 +2760,7 @@
         function saveToLocalStorage() {
             localStorage.setItem('prospectClients', JSON.stringify(clients));
             localStorage.setItem('prospectProperties', JSON.stringify(properties));
+            localStorage.setItem('prospectAgenda', JSON.stringify(agenda));
             localStorage.setItem('corretorData', JSON.stringify(corretorData));
         }
 
@@ -2788,6 +2954,190 @@
             progressDiv.innerHTML = '<strong>Envio em massa concluído!</strong>';
             startBtn.disabled = false;
         }
+        
+        // ===============================================
+        // Funções da AGENDA
+        // ===============================================
+
+        function updateDashboardAgenda() {
+            const listEl = document.getElementById('dashboardAgendaList');
+            const todayStart = new Date();
+            todayStart.setHours(0,0,0,0);
+            const todayEnd = new Date();
+            todayEnd.setHours(23,59,59,999);
+
+            const todayEvents = agenda
+                .filter(e => {
+                    const eventDate = new Date(e.start);
+                    return eventDate >= todayStart && eventDate <= todayEnd;
+                })
+                .sort((a,b) => new Date(a.start) - new Date(b.start));
+            
+            if (todayEvents.length === 0) {
+                listEl.innerHTML = '<li class="dashboard-agenda-item">Nenhum compromisso para hoje.</li>';
+                return;
+            }
+
+            listEl.innerHTML = todayEvents.map(event => {
+                const client = clients.find(c => c.id === event.clientId);
+                const eventTime = new Date(event.start).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                return `
+                 <li class="dashboard-agenda-item" style="${event.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">
+                     <span class="time">${eventTime}</span>
+                     <span class="title">${event.title}</span>
+                     ${client ? `<div class="client">com ${client.nome}</div>` : ''}
+                 </li>
+                `;
+            }).join('');
+        }
+        
+        function displayAgenda() {
+            const listEl = document.getElementById('agendaList');
+            const now = new Date();
+            
+            let filteredAgenda = [...agenda];
+
+            if (currentAgendaFilter === 'today') {
+                const todayStart = new Date();
+                todayStart.setHours(0,0,0,0);
+                const todayEnd = new Date();
+                todayEnd.setHours(23,59,59,999);
+                filteredAgenda = agenda.filter(e => {
+                    const eventDate = new Date(e.start);
+                    return eventDate >= todayStart && eventDate <= todayEnd;
+                });
+            } else if (currentAgendaFilter === 'week') {
+                const weekStart = new Date();
+                weekStart.setHours(0,0,0,0);
+                const dayOfWeek = weekStart.getDay();
+                weekStart.setDate(weekStart.getDate() - dayOfWeek);
+
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                weekEnd.setHours(23,59,59,999);
+                 filteredAgenda = agenda.filter(e => {
+                    const eventDate = new Date(e.start);
+                    return eventDate >= weekStart && eventDate <= weekEnd;
+                });
+            }
+            
+            filteredAgenda.sort((a,b) => new Date(a.start) - new Date(b.start));
+            
+            if (filteredAgenda.length === 0) {
+                listEl.innerHTML = '<p style="text-align: center; padding: 20px;">Nenhum compromisso encontrado para este período.</p>';
+                return;
+            }
+            
+            const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+            listEl.innerHTML = filteredAgenda.map(event => {
+                const eventDate = new Date(event.start);
+                const client = clients.find(c => c.id === event.clientId);
+                const isOverdue = !event.completed && eventDate < now;
+
+                let classes = 'agenda-item';
+                if (event.completed) classes += ' completed';
+                if (isOverdue) classes += ' overdue';
+                
+                return `
+                <div class="${classes}" data-id="${event.id}">
+                    <div class="agenda-date">
+                        <span class="day">${eventDate.getDate()}</span>
+                        <span class="month">${months[eventDate.getMonth()]}</span>
+                        <span class="time">${eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <div class="agenda-details">
+                        <h4>${event.title}</h4>
+                        <p>${event.description || ''}</p>
+                        ${client ? `<p>Cliente: <strong class="client-link">${client.nome}</strong></p>` : ''}
+                    </div>
+                    <div class="agenda-actions">
+                         <button class="action-btn action-complete" data-action="complete" data-id="${event.id}" title="${event.completed ? 'Marcar como pendente' : 'Marcar como concluído'}">
+                            <i class="fas ${event.completed ? 'fa-times-circle' : 'fa-check-circle'}"></i>
+                        </button>
+                        <button class="action-btn action-edit" data-action="edit" data-id="${event.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn action-delete" data-action="delete" data-id="${event.id}" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        
+        function showEventForm(event = null) {
+            document.getElementById('eventForm').reset();
+            const clientSelect = document.getElementById('eventClientId');
+            clientSelect.innerHTML = '<option value="">Nenhum</option>';
+            clients.forEach(c => {
+                 clientSelect.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+            });
+
+            document.getElementById('eventFormTitle').textContent = event ? 'Editar Compromisso' : 'Novo Compromisso';
+            document.getElementById('editEventId').value = event ? event.id : '';
+            document.getElementById('eventStatusGroup').style.display = event ? 'block' : 'none';
+
+            if (event) {
+                const eventDate = new Date(event.start);
+                document.getElementById('eventTitle').value = event.title;
+                document.getElementById('eventDate').value = eventDate.toISOString().split('T')[0];
+                document.getElementById('eventTime').value = eventDate.toTimeString().split(' ')[0].substring(0, 5);
+                document.getElementById('eventClientId').value = event.clientId || '';
+                document.getElementById('eventDescription').value = event.description || '';
+                document.getElementById('eventStatus').checked = event.completed;
+            } else {
+                 document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
+            }
+            openModal(eventModal);
+        }
+
+        function saveEvent(e) {
+            e.preventDefault();
+            const eventId = document.getElementById('editEventId').value;
+            const date = document.getElementById('eventDate').value;
+            const time = document.getElementById('eventTime').value || '00:00';
+            
+            const eventData = {
+                id: eventId || generateUniqueId(),
+                title: document.getElementById('eventTitle').value,
+                start: new Date(`${date}T${time}`).toISOString(),
+                clientId: document.getElementById('eventClientId').value,
+                description: document.getElementById('eventDescription').value,
+                completed: document.getElementById('eventStatus').checked
+            };
+
+            if (eventId) {
+                const index = agenda.findIndex(ev => ev.id === eventId);
+                if (index !== -1) agenda[index] = eventData;
+            } else {
+                agenda.push(eventData);
+            }
+            
+            saveToLocalStorage();
+            updateAllDashboards();
+            closeModal(eventModal);
+            showAlert('success', `Compromisso ${eventId ? 'atualizado' : 'salvo'} com sucesso!`);
+        }
+        
+        function editEvent(id) {
+            const event = agenda.find(e => e.id === id);
+            if (event) showEventForm(event);
+        }
+
+        function deleteEvent(id) {
+            if (confirm('Tem certeza que deseja excluir este compromisso?')) {
+                agenda = agenda.filter(e => e.id !== id);
+                saveToLocalStorage();
+                updateAllDashboards();
+                showAlert('success', 'Compromisso excluído com sucesso!');
+            }
+        }
+
+        function toggleEventComplete(id) {
+            const index = agenda.findIndex(e => e.id === id);
+            if (index > -1) {
+                agenda[index].completed = !agenda[index].completed;
+                saveToLocalStorage();
+                updateAllDashboards();
+            }
+        }
 
 
         // ===============================================
@@ -2799,19 +3149,53 @@
             const client = clients.find(c => c.id === clientId);
             if (!client) return;
 
-            const element = document.getElementById('clientViewContent');
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new jsPDF('p', 'mm', 'a4');
             
             showAlert('info', 'Gerando PDF da ficha do cliente, por favor aguarde...');
 
-            const canvas = await html2canvas(element);
+            const contentElement = document.getElementById('clientViewContent');
+            const agendaElement = document.getElementById('clientViewAgenda');
+
+            doc.setFontSize(18);
+            doc.setTextColor(0, 82, 204);
+            doc.text(`Ficha do Cliente: ${client.nome}`, 10, 15);
+            
+            const canvas = await html2canvas(contentElement, { scale: 2 });
             const imgData = canvas.toDataURL('image/png');
-            
             const pdfWidth = doc.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            const imgHeight = (canvas.height * (pdfWidth - 20)) / canvas.width;
+            doc.addImage(imgData, 'PNG', 10, 25, pdfWidth - 20, imgHeight);
+
+            let finalY = 25 + imgHeight + 10;
+            if (finalY > doc.internal.pageSize.getHeight() - 30) {
+                 doc.addPage();
+                 finalY = 15;
+            }
             
-            doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            doc.setFontSize(16);
+            doc.text('Histórico de Compromissos', 10, finalY);
+            finalY += 8;
+
+            const clientEvents = agenda.filter(ev => ev.clientId === clientId).sort((a,b) => new Date(b.start) - new Date(a.start));
+            if(clientEvents.length > 0) {
+                doc.setFontSize(10);
+                clientEvents.forEach(event => {
+                    const eventDate = new Date(event.start);
+                    const dateStr = `${eventDate.toLocaleDateString('pt-BR')} ${eventDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}`;
+                    
+                    const textLines = doc.splitTextToSize(`- ${dateStr}: ${event.title}${event.completed ? ' (Concluído)' : ''} \n  Descrição: ${event.description || 'N/A'}`, pdfWidth - 20);
+                    doc.text(textLines, 10, finalY);
+                    finalY += (textLines.length * 5) + 3; // Ajusta o espaçamento
+                     if (finalY > doc.internal.pageSize.getHeight() - 15) {
+                        doc.addPage();
+                        finalY = 15;
+                    }
+                });
+            } else {
+                 doc.text('Nenhum compromisso registrado.', 10, finalY);
+            }
+
             doc.save(`ficha-cliente-${client.nome.replace(/\s/g, '_')}.pdf`);
         }
 
@@ -2825,14 +3209,18 @@
             const doc = new jsPDF('p', 'mm', 'a4');
 
             showAlert('info', 'Gerando PDF, por favor aguarde...');
+            
+            doc.setFontSize(18);
+            doc.setTextColor(0, 82, 204);
+            doc.text(`Ficha do Imóvel: ${property.nome}`, 10, 15);
 
-            const canvas = await html2canvas(element);
+            const canvas = await html2canvas(element, { scale: 2 });
             const imgData = canvas.toDataURL('image/png');
             
             const pdfWidth = doc.internal.pageSize.getWidth();
-            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+            const imgHeight = (canvas.height * (pdfWidth-20)) / canvas.width;
 
-            doc.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, imgHeight);
+            doc.addImage(imgData, 'PNG', 10, 25, pdfWidth - 20, imgHeight);
 
             doc.save(`ficha-imovel-${property.nome.replace(/\s/g, '_')}.pdf`);
         }
